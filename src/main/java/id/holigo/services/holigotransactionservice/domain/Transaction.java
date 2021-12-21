@@ -58,7 +58,7 @@ public class Transaction {
     private Timestamp expiredAt;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal discountAmmount;
+    private BigDecimal discountAmount;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal fareAmount;
