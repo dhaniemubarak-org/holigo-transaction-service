@@ -1,7 +1,7 @@
 package id.holigo.services.holigotransactionservice.web.model;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import id.holigo.services.common.model.StatusOrderEnum;
@@ -21,9 +21,9 @@ public class TransactionDtoForUser {
 
     private String shortId;
 
-    private OffsetDateTime createdAt;
+    private Timestamp createdAt;
 
-    private OffsetDateTime expiredAt;
+    private Timestamp expiredAt;
 
     private BigDecimal discountAmount;
 

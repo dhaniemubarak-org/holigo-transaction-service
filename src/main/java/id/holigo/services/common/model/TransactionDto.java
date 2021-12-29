@@ -1,7 +1,7 @@
 package id.holigo.services.common.model;
 
 import java.math.BigDecimal;
-// import java.time.OffsetDateTime;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -21,13 +21,13 @@ public class TransactionDto {
 
     private String shortId;
 
-    // private OffsetDateTime createdAt;
+    private Timestamp createdAt;
 
-    // private OffsetDateTime updatedAt;
+    private Timestamp updatedAt;
 
-    // private OffsetDateTime deletedAt;
+    private Timestamp deletedAt;
 
-    // private OffsetDateTime expiredAt;
+    private Timestamp expiredAt;
 
     private BigDecimal discountAmount;
 
