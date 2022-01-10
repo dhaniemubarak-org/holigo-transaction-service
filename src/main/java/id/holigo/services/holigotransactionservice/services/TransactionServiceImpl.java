@@ -12,9 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import id.holigo.services.common.model.TransactionDto;
-import id.holigo.services.holigotransactionservice.component.ProductDetail;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
+import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
+import id.holigo.services.holigotransactionservice.web.mappers.DetailProductMapper;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.holigotransactionservice.web.model.DetailProductForUser;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
@@ -31,7 +32,10 @@ public class TransactionServiceImpl implements TransactionService {
         private final TransactionMapper transactionMapper;
 
         @Autowired
-        private final ProductDetail productDetail;
+        private final ProductPulsa productPulsa;
+
+        @Autowired
+        private final DetailProductMapper detailProductMapper;
 
         @Override
         public TransactionPaginateForUser listTeaForUser(PageRequest pageRequest) {
@@ -69,10 +73,8 @@ public class TransactionServiceImpl implements TransactionService {
                 }
                 Transaction transaction = retrieveTransaction.get();
 
-                detailProduct = productDetail.productSender(transaction.getTransactionType(),
-                                transaction.getTransactionId());
-
-                return detailProduct;
+                return detailProductMapper.detailProductTransactionToDetailProductForUser(
+                                productPulsa.sendDetailProduct(transaction.getProductId()));
         }
 
 }

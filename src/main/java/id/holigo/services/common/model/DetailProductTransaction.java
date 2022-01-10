@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DetailProductTransaction {
 
-    private String id;
+    private Integer id;
     private String imageUrl;
     private String name;
     private String nominalSelected;

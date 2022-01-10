@@ -26,7 +26,8 @@ public class ProductPulsa {
     @Autowired
     private final ObjectMapper objectMapper;
 
-    public DetailProductTransaction sendDetailProduct(DetailProductTransaction productTransaction) throws JMSException {
+    public DetailProductTransaction sendDetailProduct(Integer productId) throws JMSException {
+        DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(productId).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_PULSA, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
