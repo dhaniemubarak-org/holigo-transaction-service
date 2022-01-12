@@ -17,7 +17,7 @@ import id.holigo.services.holigotransactionservice.repositories.TransactionRepos
 import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
 import id.holigo.services.holigotransactionservice.web.mappers.DetailProductMapper;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
-import id.holigo.services.holigotransactionservice.web.model.DetailProductForUser;
+import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
 
@@ -63,8 +63,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         @Override
-        public DetailProductForUser detailProductTransaction(UUID id) throws JMSException {
-                DetailProductForUser detailProduct = new DetailProductForUser();
+        public DetailProductDtoForUser detailProductTransaction(UUID id) throws JMSException {
+                DetailProductDtoForUser detailProduct = new DetailProductDtoForUser();
                 Optional<Transaction> retrieveTransaction = transactionRepository.findById(id);
                 if (retrieveTransaction.isEmpty()) {
                         detailProduct.setMessage("Transaction tidak ditemukan!");
