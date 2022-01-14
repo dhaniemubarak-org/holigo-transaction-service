@@ -21,6 +21,8 @@ public class TransactionDto {
 
     private String shortId;
 
+    private Long userId;
+
     private Timestamp createdAt;
 
     private Timestamp updatedAt;

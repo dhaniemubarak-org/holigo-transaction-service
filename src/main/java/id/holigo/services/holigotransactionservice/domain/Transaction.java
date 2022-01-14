@@ -44,6 +44,8 @@ public class Transaction {
     @Column(columnDefinition = "varchar(10)", nullable = true)
     private String shortId;
 
+    private Long userId;
+
     @CreationTimestamp
     @Column(updatable = false)
     private Timestamp createdAt;
@@ -94,5 +96,7 @@ public class Transaction {
     private StatusPaymentEnum statusPayment;
 
     private StatusOrderEnum statusOrder;
+
+    private String note;
 
 }
