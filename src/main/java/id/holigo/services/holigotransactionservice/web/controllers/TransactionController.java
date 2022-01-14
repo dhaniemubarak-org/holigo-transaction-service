@@ -40,7 +40,7 @@ public class TransactionController {
         }
 
         TransactionPaginateForUser transactionList = transactionService
-                .listTeaForUser(PageRequest.of(pageNumber, pageSize));
+                .listTransactionForUser(PageRequest.of(pageNumber, pageSize));
 
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }

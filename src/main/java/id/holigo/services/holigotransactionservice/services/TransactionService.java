@@ -12,9 +12,11 @@ import id.holigo.services.holigotransactionservice.web.model.TransactionPaginate
 
 public interface TransactionService {
 
-    TransactionPaginateForUser listTeaForUser(PageRequest pageRequest);
+    TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest);
 
     TransactionDto createNewTransaction(TransactionDto transactionDto);
 
     DetailProductDtoForUser detailProductTransaction(UUID id) throws JMSException;
+
+    TransactionDto getTransactionById(UUID id);
 }

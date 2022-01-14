@@ -38,7 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
         private final DetailProductMapper detailProductMapper;
 
         @Override
-        public TransactionPaginateForUser listTeaForUser(PageRequest pageRequest) {
+        public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest) {
                 TransactionPaginateForUser transactionPaginateForUser;
                 Page<Transaction> transactionPage;
 
@@ -75,6 +75,17 @@ public class TransactionServiceImpl implements TransactionService {
 
                 return detailProductMapper.detailProductTransactionToDetailProductForUser(
                                 productPulsa.sendDetailProduct(transaction.getProductId()));
+        }
+
+        @Override
+        public TransactionDto getTransactionById(UUID id) {
+                Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
+                if (fetchTransaction.isPresent()) {
+                        TransactionDto transactionDto = transactionMapper
+                                        .transactionToTransactionDto(fetchTransaction.get());
+                        return transactionDto;
+                }
+                return null;
         }
 
 }
