@@ -1,7 +1,5 @@
 package id.holigo.services.holigotransactionservice.web.model;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -21,8 +19,6 @@ public class DetailProductForUser {
     @JsonIgnore
     private Boolean status;
     private String name;
-    private String imageUrl;
-    private String nominalSelected;
-    private String description;
-    private BigDecimal price;
+    private String type;
+    private ProductTransaction product;
 }

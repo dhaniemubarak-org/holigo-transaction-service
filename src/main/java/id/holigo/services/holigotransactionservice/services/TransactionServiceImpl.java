@@ -11,13 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import id.holigo.services.common.model.DetailProductTransaction;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
-import id.holigo.services.holigotransactionservice.web.mappers.DetailProductMapper;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.holigotransactionservice.web.model.DetailProductForUser;
+import id.holigo.services.holigotransactionservice.web.model.ProductTransaction;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
 
@@ -33,9 +34,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         @Autowired
         private final ProductPulsa productPulsa;
-
-        @Autowired
-        private final DetailProductMapper detailProductMapper;
 
         @Override
         public TransactionPaginateForUser listTeaForUser(PageRequest pageRequest) {
@@ -73,8 +71,15 @@ public class TransactionServiceImpl implements TransactionService {
                 }
                 Transaction transaction = retrieveTransaction.get();
 
-                return detailProductMapper.detailProductTransactionToDetailProductForUser(
-                                productPulsa.sendDetailProduct(transaction.getProductId()));
+                DetailProductTransaction product = productPulsa.sendDetailProduct(transaction.getProductId());
+                ProductTransaction productTrx = ProductTransaction.builder().imageUrl(product.getImageUrl())
+                                .nominalSelected(product.getNominalSelected()).description(product.getDescription())
+                                .price(product.getPrice()).build();
+
+                DetailProductForUser productForUser = DetailProductForUser.builder().name(product.getName())
+                                .type(transaction.getTransactionType()).product(productTrx).build();
+
+                return productForUser;
         }
 
 }
