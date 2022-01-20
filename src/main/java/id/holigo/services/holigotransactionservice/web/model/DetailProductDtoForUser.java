@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetailProductForUser {
+public class DetailProductDtoForUser {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message;

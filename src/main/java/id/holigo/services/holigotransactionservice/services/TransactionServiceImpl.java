@@ -17,7 +17,7 @@ import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
-import id.holigo.services.holigotransactionservice.web.model.DetailProductForUser;
+import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
 import id.holigo.services.holigotransactionservice.web.model.ProductTransaction;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
         private final ProductPulsa productPulsa;
 
         @Override
-        public TransactionPaginateForUser listTeaForUser(PageRequest pageRequest) {
+        public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest) {
                 TransactionPaginateForUser transactionPaginateForUser;
                 Page<Transaction> transactionPage;
 
@@ -61,8 +61,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         @Override
-        public DetailProductForUser detailProductTransaction(UUID id) throws JMSException {
-                DetailProductForUser detailProduct = new DetailProductForUser();
+        public DetailProductDtoForUser detailProductTransaction(UUID id) throws JMSException {
+                DetailProductDtoForUser detailProduct = new DetailProductDtoForUser();
                 Optional<Transaction> retrieveTransaction = transactionRepository.findById(id);
                 if (retrieveTransaction.isEmpty()) {
                         detailProduct.setMessage("Transaction tidak ditemukan!");
@@ -76,10 +76,21 @@ public class TransactionServiceImpl implements TransactionService {
                                 .nominalSelected(product.getNominalSelected()).description(product.getDescription())
                                 .price(product.getPrice()).build();
 
-                DetailProductForUser productForUser = DetailProductForUser.builder().name(product.getName())
+                DetailProductDtoForUser productForUser = DetailProductDtoForUser.builder().name(product.getName())
                                 .type(transaction.getTransactionType()).product(productTrx).build();
 
                 return productForUser;
+        }
+
+        @Override
+        public TransactionDto getTransactionById(UUID id) {
+                Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
+                if (fetchTransaction.isPresent()) {
+                        TransactionDto transactionDto = transactionMapper
+                                        .transactionToTransactionDto(fetchTransaction.get());
+                        return transactionDto;
+                }
+                return null;
         }
 
 }

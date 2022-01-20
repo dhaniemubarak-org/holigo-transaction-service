@@ -16,7 +16,9 @@ import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import id.holigo.services.holigotransactionservice.services.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TransactionListener {
@@ -34,5 +36,17 @@ public class TransactionListener {
         TransactionDto transaction = transactionService.createNewTransaction(transactionDto);
 
         jmsTemplate.convertAndSend(message.getJMSReplyTo(), transaction);
+    }
+
+    @JmsListener(destination = JmsConfig.GET_TRANSACTION_BY_ID)
+    public void listenForGetTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
+            Message message) throws JmsException, JMSException {
+        log.info("listen for get transaction ....");
+        TransactionDto transaction = transactionService.getTransactionById(transactionDto.getId());
+        log.info("transaction -> {}", transaction);
+        if (transaction != null) {
+            transactionDto = transaction;
+        }
+        jmsTemplate.convertAndSend(message.getJMSReplyTo(), transactionDto);
     }
 }

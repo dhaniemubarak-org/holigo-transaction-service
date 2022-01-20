@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import id.holigo.services.holigotransactionservice.services.TransactionService;
-import id.holigo.services.holigotransactionservice.web.model.DetailProductForUser;
+import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
 
@@ -40,15 +40,15 @@ public class TransactionController {
         }
 
         TransactionPaginateForUser transactionList = transactionService
-                .listTeaForUser(PageRequest.of(pageNumber, pageSize));
+                .listTransactionForUser(PageRequest.of(pageNumber, pageSize));
 
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }
 
     @GetMapping(path = { "/api/v1/transactions/{id}/product" })
-    public ResponseEntity<DetailProductForUser> getDetailProductTransaction(@PathVariable("id") UUID id)
+    public ResponseEntity<DetailProductDtoForUser> getDetailProductTransaction(@PathVariable("id") UUID id)
             throws JMSException {
-        DetailProductForUser detailProduct = transactionService.detailProductTransaction(id);
+        DetailProductDtoForUser detailProduct = transactionService.detailProductTransaction(id);
         return new ResponseEntity<>(detailProduct, HttpStatus.OK);
     }
 }
