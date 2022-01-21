@@ -13,6 +13,7 @@ public class JmsConfig {
     public static final String GET_TRANSACTION_BY_ID = "get-transaction-by-id";
 
     public static final String DETAIL_PRODUCT_PULSA = "get-detail-pulsa";
+    public static final String DETAIL_PRODUCT_PLNPRE = "get-detail-plnpre";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

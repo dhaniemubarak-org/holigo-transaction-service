@@ -11,14 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import id.holigo.services.common.model.DetailProductTransaction;
 import id.holigo.services.common.model.TransactionDto;
+import id.holigo.services.holigotransactionservice.common.ProductRoute;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
-import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
-import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
-import id.holigo.services.holigotransactionservice.web.model.ProductTransaction;
+// import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
+// import id.holigo.services.holigotransactionservice.web.model.ProductTransaction;
+import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
         private final TransactionMapper transactionMapper;
 
         @Autowired
-        private final ProductPulsa productPulsa;
+        private final ProductRoute productRoute;
 
         @Override
         public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest) {
@@ -60,27 +60,32 @@ public class TransactionServiceImpl implements TransactionService {
                 return transactionMapper.transactionToTransactionDto(savedTransaction);
         }
 
-        @Override
-        public DetailProductDtoForUser detailProductTransaction(UUID id) throws JMSException {
-                DetailProductDtoForUser detailProduct = new DetailProductDtoForUser();
-                Optional<Transaction> retrieveTransaction = transactionRepository.findById(id);
-                if (retrieveTransaction.isEmpty()) {
-                        detailProduct.setMessage("Transaction tidak ditemukan!");
-                        detailProduct.setStatus(false);
-                        return detailProduct;
-                }
-                Transaction transaction = retrieveTransaction.get();
+        // @Override
+        // public DetailProductDtoForUser detailProductTransaction(UUID id) throws
+        // JMSException {
+        // DetailProductDtoForUser detailProduct = new DetailProductDtoForUser();
+        // Optional<Transaction> retrieveTransaction =
+        // transactionRepository.findById(id);
+        // if (retrieveTransaction.isEmpty()) {
+        // detailProduct.setMessage("Transaction tidak ditemukan!");
+        // detailProduct.setStatus(false);
+        // return detailProduct;
+        // }
+        // Transaction transaction = retrieveTransaction.get();
 
-                DetailProductTransaction product = productPulsa.sendDetailProduct(transaction.getProductId());
-                ProductTransaction productTrx = ProductTransaction.builder().imageUrl(product.getImageUrl())
-                                .nominalSelected(product.getNominalSelected()).description(product.getDescription())
-                                .price(product.getPrice()).build();
+        // DetailProductTransaction product =
+        // productPulsa.sendDetailProduct(Long.valueOf(transaction.getProductId()));
+        // ProductTransaction productTrx =
+        // ProductTransaction.builder().imageUrl(product.getDetail().getImageUrl())
+        // .nominalSelected(product.getNominalSelected()).description(product.getDescription())
+        // .price(product.getPrice()).build();
 
-                DetailProductDtoForUser productForUser = DetailProductDtoForUser.builder().name(product.getName())
-                                .type(transaction.getTransactionType()).product(productTrx).build();
+        // DetailProductDtoForUser productForUser =
+        // DetailProductDtoForUser.builder().name(product.getName())
+        // .type(transaction.getTransactionType()).product(productTrx).build();
 
-                return productForUser;
-        }
+        // return productForUser;
+        // }
 
         @Override
         public TransactionDto getTransactionById(UUID id) {
@@ -89,6 +94,23 @@ public class TransactionServiceImpl implements TransactionService {
                         TransactionDto transactionDto = transactionMapper
                                         .transactionToTransactionDto(fetchTransaction.get());
                         return transactionDto;
+                }
+                return null;
+        }
+
+        @Override
+        public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
+                Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
+                if (fetchTransaction.isPresent()) {
+                        TransactionDtoForUser transactionDtoForUser = transactionMapper
+                                        .transactionToTransactionDtoForUser(fetchTransaction.get());
+
+                        Object detailProduct = productRoute.getDetailProduct(
+                                        transactionDtoForUser.getTransactionType(),
+                                        Long.valueOf(transactionDtoForUser.getTransactionId()));
+
+                        transactionDtoForUser.setDetail(detailProduct);
+                        return transactionDtoForUser;
                 }
                 return null;
         }

@@ -44,4 +44,6 @@ public class TransactionDtoForUser {
     private StatusPaymentEnum statusPayment;
 
     private StatusOrderEnum statusOrder;
+
+    private Object detail;
 }

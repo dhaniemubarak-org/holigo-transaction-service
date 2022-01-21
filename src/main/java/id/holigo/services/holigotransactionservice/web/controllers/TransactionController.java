@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import id.holigo.services.holigotransactionservice.services.TransactionService;
-import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
+// import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
+import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
 
@@ -45,10 +46,21 @@ public class TransactionController {
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }
 
-    @GetMapping(path = { "/api/v1/transactions/{id}/product" })
-    public ResponseEntity<DetailProductDtoForUser> getDetailProductTransaction(@PathVariable("id") UUID id)
-            throws JMSException {
-        DetailProductDtoForUser detailProduct = transactionService.detailProductTransaction(id);
-        return new ResponseEntity<>(detailProduct, HttpStatus.OK);
+    @GetMapping(path = { "/api/v1/transactions/{id}"})
+    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException{
+        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
+        
+        if(transactionDtoForUser != null){
+            return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(transactionDtoForUser, HttpStatus.NOT_FOUND); 
     }
+
+    // @GetMapping(path = { "/api/v1/transactions/{id}/product" })
+    // public ResponseEntity<DetailProductDtoForUser> getDetailProductTransaction(@PathVariable("id") UUID id)
+    //         throws JMSException {
+    //     DetailProductDtoForUser detailProduct = transactionService.detailProductTransaction(id);
+    //     return new ResponseEntity<>(detailProduct, HttpStatus.OK);
+    // }
 }

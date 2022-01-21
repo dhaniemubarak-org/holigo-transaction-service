@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class ProductPulsa {
+public class ProductPLNPRE {
 
     @Autowired
     private final JmsTemplate jmsTemplate;
@@ -26,27 +26,26 @@ public class ProductPulsa {
     @Autowired
     private final ObjectMapper objectMapper;
 
-    public DetailProductTransaction sendDetailProduct(Long productId) throws JMSException {
-        DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(productId).build();
-        Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_PULSA, new MessageCreator() {
+    public DetailProductTransaction sendDetailProduct(Long id) throws JMSException{
+        DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(id).build();
+        Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_PLNPRE, new MessageCreator() {
             @Override
-            public Message createMessage(Session session) throws JMSException {
+            public Message createMessage(Session session) throws JMSException{
                 Message message = null;
-                try {
+                try{
                     message = session.createTextMessage(objectMapper.writeValueAsString(productTransaction));
                     message.setStringProperty("_type", "id.holigo.services.common.model.DetailProductTransaction");
                     return message;
-                } catch (JsonProcessingException e) {
-                    throw new JMSException("Error Sending Detail Product Pulsa!");
+                }catch(JsonProcessingException e){
+                    throw new JMSException("Error Sending Detail Product PLN PRE!");
                 }
             }
         });
 
         DetailProductTransaction detailProduct = new DetailProductTransaction();
-
-        try {
+        try{
             detailProduct = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
 
