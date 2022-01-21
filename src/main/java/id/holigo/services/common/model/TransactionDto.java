@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TransactionDto {
-    
+
     private UUID id;
 
     private UUID parentId;
@@ -55,7 +55,7 @@ public class TransactionDto {
 
     private UUID paymentId;
 
-    private StatusPaymentEnum statusPayment;
+    private PaymentStatusEnum paymentStatus;
 
-    private StatusOrderEnum statusOrder;
+    private OrderStatusEnum orderStatus;
 }

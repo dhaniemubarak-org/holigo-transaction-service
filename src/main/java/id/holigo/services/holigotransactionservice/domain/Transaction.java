@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -15,8 +17,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import id.holigo.services.common.model.StatusOrderEnum;
-import id.holigo.services.common.model.StatusPaymentEnum;
+import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -93,9 +95,11 @@ public class Transaction {
     @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
     private UUID paymentId;
 
-    private StatusPaymentEnum statusPayment;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatusEnum paymentStatus;
 
-    private StatusOrderEnum statusOrder;
+    @Enumerated(EnumType.STRING)
+    private OrderStatusEnum orderStatus;
 
     private String note;
 

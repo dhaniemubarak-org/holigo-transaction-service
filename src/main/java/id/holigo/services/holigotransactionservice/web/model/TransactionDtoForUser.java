@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import id.holigo.services.common.model.StatusOrderEnum;
-import id.holigo.services.common.model.StatusPaymentEnum;
+import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,9 +41,9 @@ public class TransactionDtoForUser {
 
     private UUID paymentId;
 
-    private StatusPaymentEnum statusPayment;
+    private PaymentStatusEnum statusPayment;
 
-    private StatusOrderEnum statusOrder;
+    private OrderStatusEnum statusOrder;
 
     private Object detail;
 }

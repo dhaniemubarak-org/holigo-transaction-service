@@ -1,4 +1,4 @@
-package id.holigo.services.holigotransactionservice.common;
+package id.holigo.services.holigotransactionservice.component;
 
 import javax.jms.JMSException;
 
