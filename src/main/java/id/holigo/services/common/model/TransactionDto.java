@@ -1,5 +1,6 @@
 package id.holigo.services.common.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -13,7 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionDto {
+public class TransactionDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
 

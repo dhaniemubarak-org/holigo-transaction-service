@@ -14,11 +14,13 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import id.holigo.services.common.events.TransactionEvent;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
+import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,9 @@ public class TransactionListener {
 
     @Autowired
     private final OrderStatusTransactionService orderStatusTransactionService;
+
+    @Autowired
+    private final PaymentStatusTransactionService paymentStatusTransactionService;
 
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
     public void listenForCreateNewTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
@@ -64,20 +69,56 @@ public class TransactionListener {
     @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_TRANSACTION_BY_TRANSACTION_ID)
     public void listenForSetOrderStatusTransaction(TransactionDto transactionDto) {
         log.info("listenForSetOrderStatusTransaction is running ....");
+        log.info("transactionDto -> {}", transactionDto);
 
         Optional<Transaction> fetchTransaction = transactionRepository.findByTransactionIdAndTransactionType(
                 transactionDto.getTransactionId(), transactionDto.getTransactionType());
         if (fetchTransaction.isPresent()) {
+            log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
-            switch (transaction.getOrderStatus().toString()) {
-                case "ISSUED":
+            switch (transaction.getOrderStatus()) {
+                case ISSUED:
+                    log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
                     break;
-                case "ISSUED_FAILED":
+                case ISSUED_FAILED:
+                    log.info("Switch to ISSUED_FAILED");
                     orderStatusTransactionService.issuedFail(transaction.getId());
                     break;
+                case RETRYING_ISSUED:
+                    log.info("Switch to RETRYING_ISSUED");
+                    break;
+                case WAITING_ISSEUD:
+                    log.info("Switch to WAITING_ISSUED");
+                    break;
+                case PROCESS_BOOK:
+                case BOOKED:
+                case BOOK_FAILED:
+                case PROCESS_ISSUED:
+                case ORDER_EXPIRED:
+                case ORDER_CANCELED:
+                    break;
+
             }
+        } else {
+            log.info("transaction not found");
         }
 
+    }
+
+    @JmsListener(destination = JmsConfig.ISSUED_TRANSACTION_BY_ID)
+    public void listenForIssuedFromPayment(TransactionEvent transactionEvent) {
+        log.info("Listening for issued from payment...");
+        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
+        TransactionDto transactionDto = transactionEvent.getTransactionDto();
+        Optional<Transaction> fetchTransaction = transactionRepository.findByIdAndPaymentStatus(transactionDto.getId(),
+                transactionDto.getPaymentStatus());
+        if (fetchTransaction.isPresent()) {
+            log.info("Transaction found");
+            Transaction transaction = fetchTransaction.get();
+            paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
+        } else {
+            log.info("Transaction not found");
+        }
     }
 }
