@@ -13,9 +13,12 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import id.holigo.services.common.events.IssuedPrepaidElectricityEvent;
 import id.holigo.services.common.events.TransactionEvent;
 import id.holigo.services.common.model.TransactionDto;
+import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
@@ -45,6 +48,7 @@ public class TransactionListener {
     @Autowired
     private final PaymentStatusTransactionService paymentStatusTransactionService;
 
+    @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
     public void listenForCreateNewTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
             Message message) throws JmsException, JMSException {
@@ -66,17 +70,23 @@ public class TransactionListener {
         jmsTemplate.convertAndSend(message.getJMSReplyTo(), transactionDto);
     }
 
-    @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_TRANSACTION_BY_TRANSACTION_ID)
-    public void listenForSetOrderStatusTransaction(TransactionDto transactionDto) {
+    @Transactional
+    @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_BY_TRANSACTION_ID_TYPE)
+    public void listenForSetOrderStatusTransaction(IssuedPrepaidElectricityEvent issuedPrepaidElectricityEvent) {
         log.info("listenForSetOrderStatusTransaction is running ....");
-        log.info("transactionDto -> {}", transactionDto);
+        log.info("issuedPrepaidElectricityEvent -> {}",
+                issuedPrepaidElectricityEvent.getPrepaidElectricitiesTransactionDto());
+
+        PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = issuedPrepaidElectricityEvent
+                .getPrepaidElectricitiesTransactionDto();
 
         Optional<Transaction> fetchTransaction = transactionRepository.findByTransactionIdAndTransactionType(
-                transactionDto.getTransactionId(), transactionDto.getTransactionType());
+                String.valueOf(prepaidElectricitiesTransactionDto.getId()).toString(),
+                prepaidElectricitiesTransactionDto.getSupplierProductCode());
         if (fetchTransaction.isPresent()) {
             log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
-            switch (transaction.getOrderStatus()) {
+            switch (prepaidElectricitiesTransactionDto.getOrderStatus()) {
                 case ISSUED:
                     log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
@@ -106,6 +116,7 @@ public class TransactionListener {
 
     }
 
+    @Transactional
     @JmsListener(destination = JmsConfig.ISSUED_TRANSACTION_BY_ID)
     public void listenForIssuedFromPayment(TransactionEvent transactionEvent) {
         log.info("Listening for issued from payment...");
@@ -117,8 +128,24 @@ public class TransactionListener {
             log.info("Transaction found");
             Transaction transaction = fetchTransaction.get();
             paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
+            orderStatusTransactionService.processIssued(transaction.getId());
         } else {
             log.info("Transaction not found");
+        }
+    }
+
+    @Transactional
+    @JmsListener(destination = JmsConfig.SET_PAYMENT_IN_TRANSACTION_BY_ID)
+    public void listenForSetPayment(TransactionEvent transactionEvent) {
+        log.info("Listening for set payment...");
+        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
+        TransactionDto transactionDto = transactionEvent.getTransactionDto();
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
+        if (fetchTransaction.isPresent()) {
+            Transaction transaction = fetchTransaction.get();
+            transaction.setPaymentId(transactionDto.getPaymentId());
+            transaction.setPaymentStatus(transactionDto.getPaymentStatus());
+            transactionRepository.save(transaction);
         }
     }
 }

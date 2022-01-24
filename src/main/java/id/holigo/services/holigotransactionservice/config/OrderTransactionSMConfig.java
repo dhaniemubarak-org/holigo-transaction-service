@@ -14,12 +14,15 @@ import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 
 import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
+import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
+import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +36,11 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PrepaidElectricitiesTransactionService prepaidElectricitiesTransactionService;
+
+    @Autowired
+    private final PaymentService paymentService;
+
+    private final TransactionMapper transactionMapper;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -89,6 +97,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     context.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
 
+            log.info("Transaction before send JMS -> {}", transaction);
             switch (transaction.getTransactionType()) {
                 case "PRA":
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto
@@ -98,6 +107,17 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     prepaidElectricitiesTransactionService.issuedTransaction(prepaidElectricitiesTransactionDto);
                     break;
             }
+        };
+    }
+
+    public Action<OrderStatusEnum, OrderStatusEvent> issuedSuccess() {
+        log.info("issuedSuccess is running...");
+        return context -> {
+            Transaction transaction = transactionRepository.getById(UUID.fromString(
+                    context.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+            TransactionDto transactionDto = transactionMapper.transactionToTransactionDto(transaction);
+            paymentService.transactionIssued(transactionDto);
+
         };
     }
 }

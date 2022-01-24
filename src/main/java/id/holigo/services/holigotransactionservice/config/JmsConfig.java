@@ -13,9 +13,11 @@ public class JmsConfig {
     public static final String DETAIL_PRODUCT_PULSA = "get-detail-pulsa";
     public static final String DETAIL_PRODUCT_PLNPRE = "get-detail-plnpre";
     public static final String ISSUED_PREPAID_ELECTRICITIES_BY_ID = "issued-prepaid-electricities-by-id";
-    public static final String SET_ORDER_STATUS_TRANSACTION_BY_TRANSACTION_ID = "set-order-status-transaction-by-transaction-id";
+    public static final String SET_ORDER_STATUS_BY_TRANSACTION_ID_TYPE = "set-order-status-transaction-by-transaction-id-type";
     public static final String ISSUED_TRANSACTION_BY_ID = "issued-transaction-by-id";
-    
+    public static final String SET_PAYMENT_IN_TRANSACTION_BY_ID = "set-payment-in-transaction-by-id";
+    public static final String UPDATE_PAYMENT_STATUS_BY_PAYMENT_ID = "update-payment-status-by-payment-id";
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

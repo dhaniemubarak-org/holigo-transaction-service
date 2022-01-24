@@ -93,6 +93,7 @@ public class Transaction {
     private String transactionType;
 
     @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
