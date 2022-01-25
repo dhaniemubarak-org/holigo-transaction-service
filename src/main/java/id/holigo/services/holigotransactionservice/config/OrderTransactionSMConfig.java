@@ -67,6 +67,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .event(OrderStatusEvent.PROCESS_ISSUED)
                 .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.ISSUED)
+                .action(issuedSuccess())
                 .event(OrderStatusEvent.ISSUED_SUCCESS)
                 .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.ISSUED_FAILED)
@@ -103,7 +104,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
-                            .build();
+                            .transactionId(transaction.getId()).build();
                     prepaidElectricitiesTransactionService.issuedTransaction(prepaidElectricitiesTransactionDto);
                     break;
             }

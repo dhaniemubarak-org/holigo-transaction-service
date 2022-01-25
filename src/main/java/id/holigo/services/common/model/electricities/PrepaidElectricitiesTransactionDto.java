@@ -3,6 +3,7 @@ package id.holigo.services.common.model.electricities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import id.holigo.services.common.model.DeviceTypeEnum;
 import id.holigo.services.common.model.OrderStatusEnum;
@@ -86,4 +87,6 @@ public class PrepaidElectricitiesTransactionDto implements Serializable {
     private Integer onCheck;
 
     private Integer flag;
+
+    private UUID transactionId;
 }
