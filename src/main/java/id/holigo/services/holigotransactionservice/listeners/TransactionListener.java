@@ -15,10 +15,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import id.holigo.services.common.events.IssuedPrepaidElectricityEvent;
 import id.holigo.services.common.events.TransactionEvent;
 import id.holigo.services.common.model.TransactionDto;
-import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
@@ -83,7 +81,7 @@ public class TransactionListener {
         if (fetchTransaction.isPresent()) {
             log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
-            switch (transaction.getOrderStatus()) {
+            switch (transactionDto.getOrderStatus()) {
                 case ISSUED:
                     log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());

@@ -1,7 +1,9 @@
 package id.holigo.services.common.model.pulsa;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -14,8 +16,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PrepaidPulsaTransactionDto {
-    private Integer id;
+public class PrepaidPulsaTransactionDto implements Serializable {
+
+    private Long id;
 
     private Timestamp createdAt;
 
@@ -58,5 +61,7 @@ public class PrepaidPulsaTransactionDto {
     private OrderStatusEnum orderStatus;
 
     private Integer onCheck;
+
+    private UUID transactionId;
     
 }
