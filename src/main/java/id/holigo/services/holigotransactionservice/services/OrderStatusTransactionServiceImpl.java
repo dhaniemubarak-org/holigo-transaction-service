@@ -58,6 +58,20 @@ public class OrderStatusTransactionServiceImpl implements OrderStatusTransaction
     }
 
     @Override
+    public StateMachine<OrderStatusEnum, OrderStatusEvent> waitingIssued(UUID transactionId) {
+        StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
+        sendEvent(transactionId, sm, OrderStatusEvent.WAITING_ISSUED);
+        return sm;
+    }
+
+    @Override
+    public StateMachine<OrderStatusEnum, OrderStatusEvent> retryingIssued(UUID transactionId) {
+        StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
+        sendEvent(transactionId, sm, OrderStatusEvent.RETRYING_ISSUED);
+        return sm;
+    }
+
+    @Override
     public StateMachine<OrderStatusEnum, OrderStatusEvent> issuedFail(UUID transactionId) {
         StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
         sendEvent(transactionId, sm, OrderStatusEvent.ISSUED_FAIL);

@@ -17,6 +17,10 @@ public interface OrderStatusTransactionService {
 
     StateMachine<OrderStatusEnum, OrderStatusEvent> issuedSuccess(UUID transactionId);
 
+    StateMachine<OrderStatusEnum, OrderStatusEvent> waitingIssued(UUID transactionId);
+
+    StateMachine<OrderStatusEnum, OrderStatusEvent> retryingIssued(UUID transactionId);
+
     StateMachine<OrderStatusEnum, OrderStatusEvent> issuedFail(UUID transactionId);
 
     StateMachine<OrderStatusEnum, OrderStatusEvent> cancelTransaction(UUID transactionId);

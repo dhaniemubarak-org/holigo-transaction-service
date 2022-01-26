@@ -92,9 +92,11 @@ public class TransactionListener {
                     break;
                 case RETRYING_ISSUED:
                     log.info("Switch to RETRYING_ISSUED");
+                    orderStatusTransactionService.retryingIssued(transaction.getId());
                     break;
                 case WAITING_ISSEUD:
                     log.info("Switch to WAITING_ISSUED");
+                    orderStatusTransactionService.waitingIssued(transaction.getId());
                     break;
                 case PROCESS_BOOK:
                 case BOOKED:
