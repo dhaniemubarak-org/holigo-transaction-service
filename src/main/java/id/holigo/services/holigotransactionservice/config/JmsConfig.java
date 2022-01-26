@@ -18,6 +18,9 @@ public class JmsConfig {
     public static final String ISSUED_TRANSACTION_BY_ID = "issued-transaction-by-id";
     public static final String SET_PAYMENT_IN_TRANSACTION_BY_ID = "set-payment-in-transaction-by-id";
     public static final String UPDATE_PAYMENT_STATUS_BY_PAYMENT_ID = "update-payment-status-by-payment-id";
+    public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
+    public static final String GET_DETAIL_TRANSACTION_PDAM = "get-detail-pdam";
+    public static final String DETAIL_PRODUCT_PLNPAS = "get-detail-pln-pas";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

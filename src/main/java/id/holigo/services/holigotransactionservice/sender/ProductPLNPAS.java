@@ -42,12 +42,13 @@ public class ProductPLNPAS {
             }
         });
 
+        DetailProductTransaction productTransaction = new DetailProductTransaction();
         try{
-            detailProductTransaction = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
+            productTransaction = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
         }catch(Exception e){
             e.printStackTrace();
         }
 
-        return detailProductTransaction;
+        return productTransaction;
     }
 }

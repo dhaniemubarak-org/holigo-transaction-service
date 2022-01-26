@@ -27,13 +27,13 @@ public class ProductGame {
     private final ObjectMapper objectMapper;
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
-        DetailProductTransaction detailProductTransaction = DetailProductTransaction.builder().id(id).build();
+        DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(id).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_GAME, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
                 Message message = null;
                 try {
-                    message = session.createTextMessage(objectMapper.writeValueAsString(detailProductTransaction));
+                    message = session.createTextMessage(objectMapper.writeValueAsString(productTransaction));
                     message.setStringProperty("_type", "id.holigo.services.common.model.DetailProductTransaction");
                     return message;
                 } catch (JsonProcessingException e) {
@@ -42,13 +42,15 @@ public class ProductGame {
             }
         });
 
+        DetailProductTransaction detailProduct = new DetailProductTransaction();
+
         try {
-            detailProductTransaction = objectMapper.readValue(message.getBody(String.class),
+            detailProduct = objectMapper.readValue(message.getBody(String.class),
                     DetailProductTransaction.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return detailProductTransaction;
+        return detailProduct;
     }
 }
