@@ -16,13 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.common.model.TransactionDto;
-import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.TransactionService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SpringBootTest
 public class TransactionListenerTest {
 
@@ -57,12 +54,12 @@ public class TransactionListenerTest {
 
         assertEquals(OrderStatusEnum.BOOKED, savedTransactionDto.getOrderStatus());
 
-        paymentStatusTransactionService.transactionHasBeenPaid(savedTransactionDto.getId());
+        // paymentStatusTransactionService.transactionHasBeenPaid(savedTransactionDto.getId());
 
-        Transaction transaction = transactionRepository.getById(savedTransactionDto.getId());
+        // Transaction transaction = transactionRepository.getById(savedTransactionDto.getId());
 
-        log.info("transaction -> {}", transaction.getTransactionId());
-        assertEquals(OrderStatusEnum.PROCESS_ISSUED, transaction.getOrderStatus());
+        // log.info("transaction -> {}", transaction.getTransactionId());
+        // assertEquals(OrderStatusEnum.PROCESS_ISSUED, transaction.getOrderStatus());
 
     }
 }

@@ -21,8 +21,10 @@ import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
+import id.holigo.services.common.model.pdam.PostpaidPdamTransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +38,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PrepaidElectricitiesTransactionService prepaidElectricitiesTransactionService;
+
+    @Autowired
+    private final PostpaidPdamTransactionService postpaidPdamTransactionService;
 
     @Autowired
     private final PaymentService paymentService;
@@ -106,6 +111,14 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidElectricitiesTransactionService.issuedTransaction(prepaidElectricitiesTransactionDto);
+                    break;
+                case "PAM":
+                    log.info("Issued PAM is running....");
+                    PostpaidPdamTransactionDto postpaidPdamTransactionDto = PostpaidPdamTransactionDto.builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).OrderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidPdamTransactionService.issuedTransaction(postpaidPdamTransactionDto);
                     break;
             }
         };

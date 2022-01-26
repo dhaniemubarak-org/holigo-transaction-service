@@ -72,21 +72,18 @@ public class TransactionListener {
 
     @Transactional
     @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_BY_TRANSACTION_ID_TYPE)
-    public void listenForSetOrderStatusTransaction(IssuedPrepaidElectricityEvent issuedPrepaidElectricityEvent) {
+    public void listenForSetOrderStatusTransaction(TransactionEvent transactionEvent) {
         log.info("listenForSetOrderStatusTransaction is running ....");
-        log.info("issuedPrepaidElectricityEvent -> {}",
-                issuedPrepaidElectricityEvent.getPrepaidElectricitiesTransactionDto());
+        log.info("transactionDto -> {}",
+                transactionEvent.getTransactionDto());
 
-        PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = issuedPrepaidElectricityEvent
-                .getPrepaidElectricitiesTransactionDto();
+        TransactionDto transactionDto = transactionEvent.getTransactionDto();
 
-        Optional<Transaction> fetchTransaction = transactionRepository.findByTransactionIdAndTransactionType(
-                String.valueOf(prepaidElectricitiesTransactionDto.getId()).toString(),
-                prepaidElectricitiesTransactionDto.getSupplierProductCode());
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if (fetchTransaction.isPresent()) {
             log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
-            switch (prepaidElectricitiesTransactionDto.getOrderStatus()) {
+            switch (transaction.getOrderStatus()) {
                 case ISSUED:
                     log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());

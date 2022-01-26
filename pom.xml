@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>id.holigo.services</groupId>
 	<artifactId>holigo-transaction-service</artifactId>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<name>holigo-transaction-service</name>
 	<description>Holigo transaction service</description>
 	<properties>
