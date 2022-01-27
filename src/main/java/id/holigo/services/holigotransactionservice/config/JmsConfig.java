@@ -22,6 +22,7 @@ public class JmsConfig {
     public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
     public static final String GET_DETAIL_TRANSACTION_PDAM = "get-detail-pdam";
     public static final String DETAIL_PRODUCT_PLNPAS = "get-detail-pln-pas";
+    public static final String DETAIL_PRODUCT_EWAL = "get-detail-ewallet";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

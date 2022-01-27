@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import id.holigo.services.common.model.DetailProductTransaction;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductPLNPAS {
     
     @Autowired
@@ -42,9 +44,11 @@ public class ProductPLNPAS {
             }
         });
 
+        log.info("Getting Reply -> {}", message.getBody(String.class));
         DetailProductTransaction productTransaction = new DetailProductTransaction();
         try{
             productTransaction = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
+            log.info("Mapping Object -> {}", productTransaction);
         }catch(Exception e){
             e.printStackTrace();
         }

@@ -5,6 +5,7 @@ import javax.jms.JMSException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import id.holigo.services.holigotransactionservice.sender.ProductEwallet;
 import id.holigo.services.holigotransactionservice.sender.ProductGame;
 import id.holigo.services.holigotransactionservice.sender.ProductPLNPAS;
 import id.holigo.services.holigotransactionservice.sender.ProductPLNPRE;
@@ -31,6 +32,9 @@ public class ProductRoute {
     @Autowired
     private final ProductPLNPAS productPLNPAS;
 
+    @Autowired
+    private final ProductEwallet productEwallet;
+
     public Object getDetailProduct(String transactionType, Long id) throws JMSException {
         Object fetchData = null;
         switch (transactionType) {
@@ -55,6 +59,11 @@ public class ProductRoute {
 
             case "PAS":
                 fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
+                break;
+
+            case "EWAL":
+            case "DWAL":
+                fetchData = productEwallet.sendDetailProduct(id).getDetail();
                 break;
 
         }
