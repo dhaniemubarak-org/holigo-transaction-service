@@ -19,10 +19,16 @@ public class JmsConfig {
     public static final String ISSUED_TRANSACTION_BY_ID = "issued-transaction-by-id";
     public static final String SET_PAYMENT_IN_TRANSACTION_BY_ID = "set-payment-in-transaction-by-id";
     public static final String UPDATE_PAYMENT_STATUS_BY_PAYMENT_ID = "update-payment-status-by-payment-id";
-    public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
     public static final String GET_DETAIL_TRANSACTION_PDAM = "get-detail-pdam";
+    
     public static final String DETAIL_PRODUCT_PLNPAS = "get-detail-pln-pas";
-    public static final String DETAIL_PRODUCT_EWAL = "get-detail-ewallet";
+    public static final String ISSUED_POSTPAID_ELECTRICITIES_BY_ID = "issued-postpaid-electricities-by-id";
+
+    public static final String ISSUED_PREPAID_WALLET_BY_ID = "issued-prepaid-wallet-by-id";
+    public static final String DETAIL_PRODUCT_WALLET_TRANSACTION = "detail-product-wallet-transaction";
+    
+    public static final String ISSUED_PREPAID_GAMES_BY_ID = "issued-prepaid-games-by-id";
+    public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

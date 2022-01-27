@@ -28,7 +28,7 @@ public class ProductEwallet {
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
         DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(id).build();
-        Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_EWAL, new MessageCreator() {
+        Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_WALLET_TRANSACTION, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
                 Message message = null;
