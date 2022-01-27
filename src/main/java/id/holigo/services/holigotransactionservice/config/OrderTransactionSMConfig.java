@@ -16,12 +16,14 @@ import org.springframework.statemachine.state.State;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
+import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.pulsa.PrepaidPulsaTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaTransactionService;
@@ -46,6 +48,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PrepaidPulsaTransactionService prepaidPulsaTransactionService;
+
+    @Autowired
+    private final PostpaidElectricitiesTransactionService postpaidElectricitiesTransactionService;
 
     @Autowired
     private final PaymentService paymentService;
@@ -140,6 +145,15 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidPulsaTransactionService.issuedTransaction(prepaidPulsaTransactionDto);
+                    break;
+                case "PAS":
+                    log.info("Issued Pascabayar is running...");
+                    PostpaidElectricitiesTransactionDto postpaidElectricitiesTransactionDto = PostpaidElectricitiesTransactionDto
+                            .builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidElectricitiesTransactionService.issuedTransaction(postpaidElectricitiesTransactionDto);
                     break;
             }
         };
