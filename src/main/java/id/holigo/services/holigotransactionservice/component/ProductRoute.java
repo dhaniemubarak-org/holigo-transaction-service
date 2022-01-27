@@ -42,7 +42,7 @@ public class ProductRoute {
             case "PUL":
             case "PD":
             case "PR":
-                fetchData = productPulsa.sendDetailProduct(id);
+                fetchData = productPulsa.sendDetailProduct(id).getDetail();
                 break;
 
             case "PRA":
