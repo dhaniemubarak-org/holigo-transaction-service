@@ -19,6 +19,7 @@ import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransac
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.pulsa.PrepaidPulsaTransactionDto;
 import id.holigo.services.common.model.games.PrepaidGameTransactionDto;
+import id.holigo.services.common.model.ewallet.PrepaidWalletTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
@@ -29,6 +30,7 @@ import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPda
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidGameTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaTransactionService;
+import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidWalletTransactionService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.common.model.pdam.PostpaidPdamTransactionDto;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +58,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PrepaidGameTransactionService prepaidGameTransactionService;
+
+    @Autowired
+    private final PrepaidWalletTransactionService prepaidWalletTransactionService;
 
     @Autowired
     private final PaymentService paymentService;
@@ -167,6 +172,15 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidGameTransactionService.issuedTransaction(prepaidGameTransactionDto);
+                    break;
+                case "EWAL":
+                case "DWAL":
+                    log.info("Issued EWAL / DWAL is running...");
+                    PrepaidWalletTransactionDto prepaidWalletTransactionDto = PrepaidWalletTransactionDto.builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    prepaidWalletTransactionService.issuedTranasction(prepaidWalletTransactionDto);
                     break;
             }
         };
