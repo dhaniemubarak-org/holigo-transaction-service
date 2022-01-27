@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -79,6 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         @Override
+        @Transactional
         public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
                 Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
                 if (fetchTransaction.isPresent()) {

@@ -10,7 +10,7 @@ import org.springframework.jms.support.converter.MessageType;
 public class JmsConfig {
     public static final String CREATE_NEW_TRANSACTION = "create-new-transaction";
     public static final String GET_TRANSACTION_BY_ID = "get-transaction-by-id";
-    public static final String DETAIL_PRODUCT_PULSA = "get-detail-pulsa";
+    public static final String DETAIL_PRODUCT_TRANSACTION_PULSA = "get-detail-pulsa-transaction";
     public static final String DETAIL_PRODUCT_PLNPRE = "get-detail-plnpre";
     public static final String ISSUED_PREPAID_ELECTRICITIES_BY_ID = "issued-prepaid-electricities-by-id";
     public static final String ISSUED_PREPAID_PULSA_BY_ID = "issued-prepaid-pulsa-by-id";
