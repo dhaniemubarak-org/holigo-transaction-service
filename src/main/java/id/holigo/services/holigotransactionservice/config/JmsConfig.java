@@ -30,6 +30,9 @@ public class JmsConfig {
     public static final String ISSUED_PREPAID_GAMES_BY_ID = "issued-prepaid-games-by-id";
     public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
 
+    public static final String ISSUED_POSTPAID_NETV_BY_ID = "issued-postpaid-netv-by-id";
+    public static final String DETAIL_PRODUCT_NETV_TRANSACTION = "detail-product-netv-transaction";
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

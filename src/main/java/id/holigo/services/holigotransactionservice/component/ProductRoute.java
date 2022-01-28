@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import id.holigo.services.holigotransactionservice.sender.ProductEwallet;
 import id.holigo.services.holigotransactionservice.sender.ProductGame;
+import id.holigo.services.holigotransactionservice.sender.ProductNetv;
 import id.holigo.services.holigotransactionservice.sender.ProductPLNPAS;
 import id.holigo.services.holigotransactionservice.sender.ProductPLNPRE;
 import id.holigo.services.holigotransactionservice.sender.ProductPdam;
@@ -35,6 +36,9 @@ public class ProductRoute {
 
     @Autowired
     private final ProductEwallet productEwallet;
+
+    @Autowired
+    private final ProductNetv productNetv;
 
     @Transactional
     public Object getDetailProduct(String transactionType, Long id) throws JMSException {
@@ -67,6 +71,9 @@ public class ProductRoute {
             case "DWAL":
                 fetchData = productEwallet.sendDetailProduct(id).getDetail();
                 break;
+
+            case "NETV":
+                fetchData = productNetv.sendDetailProduct(id).getDetail();
 
         }
 
