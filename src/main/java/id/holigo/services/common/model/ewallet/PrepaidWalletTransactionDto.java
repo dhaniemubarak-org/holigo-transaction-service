@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import id.holigo.services.common.model.DeviceTypeEnum;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import lombok.AllArgsConstructor;
@@ -57,7 +58,7 @@ public class PrepaidWalletTransactionDto implements Serializable{
 
     private BigDecimal nraAmount;
 
-    private String device;
+    private DeviceTypeEnum device;
 
     private OrderStatusEnum orderStatus;
 

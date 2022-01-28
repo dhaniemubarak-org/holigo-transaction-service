@@ -23,6 +23,8 @@ import id.holigo.services.holigotransactionservice.repositories.TransactionRepos
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.TransactionService;
+import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
+import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,10 +43,16 @@ public class TransactionListener {
     private final TransactionRepository transactionRepository;
 
     @Autowired
+    private final TransactionMapper transactionMapper;
+
+    @Autowired
     private final OrderStatusTransactionService orderStatusTransactionService;
 
     @Autowired
     private final PaymentStatusTransactionService paymentStatusTransactionService;
+
+    @Autowired
+    private final PaymentService paymentService;
 
     @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
@@ -81,22 +89,29 @@ public class TransactionListener {
         if (fetchTransaction.isPresent()) {
             log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
+            TransactionDto transactionDtoForPayment = transactionMapper
+                    .transactionToTransactionDto(transaction);
+            transactionDtoForPayment.setOrderStatus(transactionDto.getOrderStatus());
             switch (transactionDto.getOrderStatus()) {
                 case ISSUED:
                     log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
+                    paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case ISSUED_FAILED:
                     log.info("Switch to ISSUED_FAILED");
                     orderStatusTransactionService.issuedFail(transaction.getId());
+                    paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case RETRYING_ISSUED:
                     log.info("Switch to RETRYING_ISSUED");
                     orderStatusTransactionService.retryingIssued(transaction.getId());
+                    paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case WAITING_ISSEUD:
                     log.info("Switch to WAITING_ISSUED");
                     orderStatusTransactionService.waitingIssued(transaction.getId());
+                    paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case PROCESS_BOOK:
                 case BOOKED:

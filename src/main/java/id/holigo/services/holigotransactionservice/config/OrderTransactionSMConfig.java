@@ -14,7 +14,6 @@ import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 
 import id.holigo.services.common.model.OrderStatusEnum;
-import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.pulsa.PrepaidPulsaTransactionDto;
@@ -24,14 +23,12 @@ import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
-import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidGameTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidWalletTransactionService;
-import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.common.model.pdam.PostpaidPdamTransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,11 +59,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     @Autowired
     private final PrepaidWalletTransactionService prepaidWalletTransactionService;
 
-    @Autowired
-    private final PaymentService paymentService;
-
-    private final TransactionMapper transactionMapper;
-
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
         states.withStates().initial(OrderStatusEnum.PROCESS_BOOK)
@@ -92,7 +84,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .event(OrderStatusEvent.PROCESS_ISSUED)
                 .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.ISSUED)
-                .action(issuedSuccess())
                 .event(OrderStatusEvent.ISSUED_SUCCESS)
                 .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.ISSUED_FAILED)
@@ -183,17 +174,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     prepaidWalletTransactionService.issuedTranasction(prepaidWalletTransactionDto);
                     break;
             }
-        };
-    }
-
-    public Action<OrderStatusEnum, OrderStatusEvent> issuedSuccess() {
-        log.info("issuedSuccess is running...");
-        return context -> {
-            Transaction transaction = transactionRepository.getById(UUID.fromString(
-                    context.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
-            TransactionDto transactionDto = transactionMapper.transactionToTransactionDto(transaction);
-            paymentService.transactionIssued(transactionDto);
-
         };
     }
 }
