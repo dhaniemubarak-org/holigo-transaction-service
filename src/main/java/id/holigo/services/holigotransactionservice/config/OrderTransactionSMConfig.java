@@ -12,7 +12,6 @@ import org.springframework.statemachine.config.builders.StateMachineStateConfigu
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
-
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
@@ -23,12 +22,15 @@ import id.holigo.services.common.model.netv.PostpaidTvInternetTransactionDto;
 import id.holigo.services.common.model.telephone.PostpaidTelephoneTransactionDto;
 import id.holigo.services.common.model.insurance.PostpaidInsuranceTransactionDto;
 import id.holigo.services.common.model.multifinance.PostpaidMultifinanceTransactionDto;
+import id.holigo.services.common.model.creditcard.PostpaidCreditcardTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidCreditCardTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidInsuranceTransactionService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidMultifinanceTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTelephoneTranasctionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTvInternetTransactionService;
@@ -74,6 +76,12 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PostpaidInsuranceTransactionService postpaidInsuranceTransactionService;
+
+    @Autowired
+    private final PostpaidMultifinanceTransactionService postpaidMultifinanceTransactionService;
+
+    @Autowired
+    private final PostpaidCreditCardTransactionService postpaidCreditCardTransactionService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -220,7 +228,15 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
-                        
+                    postpaidMultifinanceTransactionService.issuedTransaction(postpaidMultifinanceTransactionDto);
+                    break;
+                case "CC":
+                    log.info("Issued CC is running...");
+                    PostpaidCreditcardTransactionDto postpaidCreditcardTransactionDto = PostpaidCreditcardTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidCreditCardTransactionService.issuedTransaction(postpaidCreditcardTransactionDto);
                     break;
             }
         };
