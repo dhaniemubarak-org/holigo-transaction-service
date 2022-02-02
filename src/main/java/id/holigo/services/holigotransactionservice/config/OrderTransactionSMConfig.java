@@ -19,12 +19,19 @@ import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransa
 import id.holigo.services.common.model.pulsa.PrepaidPulsaTransactionDto;
 import id.holigo.services.common.model.games.PrepaidGameTransactionDto;
 import id.holigo.services.common.model.ewallet.PrepaidWalletTransactionDto;
+import id.holigo.services.common.model.netv.PostpaidTvInternetTransactionDto;
+import id.holigo.services.common.model.telephone.PostpaidTelephoneTransactionDto;
+import id.holigo.services.common.model.insurance.PostpaidInsuranceTransactionDto;
+import id.holigo.services.common.model.multifinance.PostpaidMultifinanceTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidInsuranceTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTelephoneTranasctionService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTvInternetTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidGameTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaTransactionService;
@@ -58,6 +65,15 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PrepaidWalletTransactionService prepaidWalletTransactionService;
+
+    @Autowired
+    private final PostpaidTvInternetTransactionService postpaidTvInternetTransactionService;
+
+    @Autowired
+    private final PostpaidTelephoneTranasctionService postpaidTelephoneTranasctionService;
+
+    @Autowired
+    private final PostpaidInsuranceTransactionService postpaidInsuranceTransactionService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -172,6 +188,39 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidWalletTransactionService.issuedTranasction(prepaidWalletTransactionDto);
+                    break;
+                case "NETV":
+                    log.info("Issued NETV / DWAL is running...");
+                    PostpaidTvInternetTransactionDto postpaidTvInternetTransactionDto = PostpaidTvInternetTransactionDto
+                            .builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidTvInternetTransactionService.issuedTransaction(postpaidTvInternetTransactionDto);
+                    break;
+                case "TLP":
+                    log.info("Issued TLP is running...");
+                    PostpaidTelephoneTransactionDto postpaidTelephoneTransactionDto = PostpaidTelephoneTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidTelephoneTranasctionService.issuedTransaction(postpaidTelephoneTransactionDto);
+                    break;
+                case "INS":
+                    log.info("Issued INS is running...");
+                    PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto = PostpaidInsuranceTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    postpaidInsuranceTransactionService.issuedTransaction(postpaidInsuranceTransactionDto);
+                    break;
+                case "MFN":
+                    log.info("Issued MFN is running...");
+                    PostpaidMultifinanceTransactionDto postpaidMultifinanceTransactionDto = PostpaidMultifinanceTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                        
                     break;
             }
         };
