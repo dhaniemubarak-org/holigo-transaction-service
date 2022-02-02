@@ -20,28 +20,20 @@ public class JmsConfig {
     public static final String SET_PAYMENT_IN_TRANSACTION_BY_ID = "set-payment-in-transaction-by-id";
     public static final String UPDATE_PAYMENT_STATUS_BY_PAYMENT_ID = "update-payment-status-by-payment-id";
     public static final String GET_DETAIL_TRANSACTION_PDAM = "get-detail-pdam";
-    
     public static final String DETAIL_PRODUCT_PLNPAS = "get-detail-pln-pas";
     public static final String ISSUED_POSTPAID_ELECTRICITIES_BY_ID = "issued-postpaid-electricities-by-id";
-
     public static final String ISSUED_PREPAID_WALLET_BY_ID = "issued-prepaid-wallet-by-id";
     public static final String DETAIL_PRODUCT_WALLET_TRANSACTION = "detail-product-wallet-transaction";
-    
     public static final String ISSUED_PREPAID_GAMES_BY_ID = "issued-prepaid-games-by-id";
     public static final String DETAIL_PRODUCT_GAME = "get-detail-game";
-
     public static final String ISSUED_POSTPAID_NETV_BY_ID = "issued-postpaid-netv-by-id";
     public static final String DETAIL_PRODUCT_NETV_TRANSACTION = "detail-product-netv-transaction";
-
     public static final String ISSUED_POSTPAID_INS_BY_ID = "issued-postpaid-ins-by-id";
     public static final String DETAIL_PRODUCT_INS_TRANSACTION = "detail-product-ins-transaction";
-    
     public static final String ISSUED_POSTPAID_MULTIFINANCE_BY_ID = "issued-postpaid-multifinance-by-id";
     public static final String DETAIL_PRODUCT_MFN_TRANSACTION = "detail-product-mfn-transaction";
-    
     public static final String ISSUED_POSTPAID_TLP_BY_ID = "issued-postpaid-tlp-by-id";
     public static final String DETAIL_PRODUCT_TLP_TRANSACTION = "detail-product-tlp-transaction";
-    
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
