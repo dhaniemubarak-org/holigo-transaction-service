@@ -21,11 +21,13 @@ import id.holigo.services.common.model.games.PrepaidGameTransactionDto;
 import id.holigo.services.common.model.ewallet.PrepaidWalletTransactionDto;
 import id.holigo.services.common.model.netv.PostpaidTvInternetTransactionDto;
 import id.holigo.services.common.model.telephone.PostpaidTelephoneTransactionDto;
+import id.holigo.services.common.model.insurance.PostpaidInsuranceTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidInsuranceTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTelephoneTranasctionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTvInternetTransactionService;
@@ -68,6 +70,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
 
     @Autowired
     private final PostpaidTelephoneTranasctionService postpaidTelephoneTranasctionService;
+
+    @Autowired
+    private final PostpaidInsuranceTransactionService postpaidInsuranceTransactionService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -199,6 +204,14 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidTelephoneTranasctionService.issuedTransaction(postpaidTelephoneTransactionDto);
+                    break;
+                case "INS":
+                    log.info("Issued INS is running...");
+                    PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto = PostpaidInsuranceTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .build();
+                    postpaidInsuranceTransactionService.issuedTransaction(postpaidInsuranceTransactionDto);
                     break;
             }
         };
