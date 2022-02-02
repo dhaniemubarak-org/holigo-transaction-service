@@ -22,6 +22,7 @@ import id.holigo.services.common.model.ewallet.PrepaidWalletTransactionDto;
 import id.holigo.services.common.model.netv.PostpaidTvInternetTransactionDto;
 import id.holigo.services.common.model.telephone.PostpaidTelephoneTransactionDto;
 import id.holigo.services.common.model.insurance.PostpaidInsuranceTransactionDto;
+import id.holigo.services.common.model.multifinance.PostpaidMultifinanceTransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
@@ -210,8 +211,16 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto = PostpaidInsuranceTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
-                            .build();
+                            .transactionId(transaction.getId()).build();
                     postpaidInsuranceTransactionService.issuedTransaction(postpaidInsuranceTransactionDto);
+                    break;
+                case "MFN":
+                    log.info("Issued MFN is running...");
+                    PostpaidMultifinanceTransactionDto postpaidMultifinanceTransactionDto = PostpaidMultifinanceTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                        
                     break;
             }
         };
