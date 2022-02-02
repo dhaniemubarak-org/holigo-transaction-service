@@ -41,6 +41,9 @@ public class JmsConfig {
     
     public static final String ISSUED_POSTPAID_TLP_BY_ID = "issued-postpaid-tlp-by-id";
     public static final String DETAIL_PRODUCT_TLP_TRANSACTION = "detail-product-tlp-transaction";
+
+    public static final String ISSUED_POSTPAID_CC_BY_ID = "issued-postpaid-cc-by-id";
+    public static final String DETAIL_PRODUCT_CC_TRANSACTION = "detail-product-cc-transaction";
     
 
     @Bean

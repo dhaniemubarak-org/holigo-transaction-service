@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import id.holigo.services.holigotransactionservice.sender.ProductCreditcard;
 import id.holigo.services.holigotransactionservice.sender.ProductEwallet;
 import id.holigo.services.holigotransactionservice.sender.ProductGame;
 import id.holigo.services.holigotransactionservice.sender.ProductInsurance;
@@ -52,6 +53,9 @@ public class ProductRoute {
     @Autowired
     private final ProductTelephone productTelephone;
 
+    @Autowired
+    private final ProductCreditcard productCreditcard;
+
     @Transactional
     public Object getDetailProduct(String transactionType, Long id) throws JMSException {
         Object fetchData = null;
@@ -95,6 +99,9 @@ public class ProductRoute {
 
             case "TLP":
                 fetchData = productTelephone.sendDetailProduct(id).getDetail();
+
+            case "CC":
+                fetchData = productCreditcard.sendDetailProduct(id).getDetail();
         }
 
         return fetchData;
