@@ -39,6 +39,9 @@ public class JmsConfig {
     public static final String ISSUED_POSTPAID_MULTIFINANCE_BY_ID = "issued-postpaid-multifinance-by-id";
     public static final String DETAIL_PRODUCT_MFN_TRANSACTION = "detail-product-mfn-transaction";
     
+    public static final String ISSUED_POSTPAID_TLP_BY_ID = "issued-postpaid-tlp-by-id";
+    public static final String DETAIL_PRODUCT_TLP_TRANSACTION = "detail-product-tlp-transaction";
+    
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

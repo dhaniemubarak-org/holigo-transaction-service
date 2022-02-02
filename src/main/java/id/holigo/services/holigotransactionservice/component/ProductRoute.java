@@ -15,6 +15,7 @@ import id.holigo.services.holigotransactionservice.sender.ProductPLNPAS;
 import id.holigo.services.holigotransactionservice.sender.ProductPLNPRE;
 import id.holigo.services.holigotransactionservice.sender.ProductPdam;
 import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
+import id.holigo.services.holigotransactionservice.sender.ProductTelephone;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -47,6 +48,9 @@ public class ProductRoute {
 
     @Autowired
     private final ProductMultifinance productMultifinance;
+
+    @Autowired
+    private final ProductTelephone productTelephone;
 
     @Transactional
     public Object getDetailProduct(String transactionType, Long id) throws JMSException {
@@ -88,6 +92,9 @@ public class ProductRoute {
 
             case "MFN":
                 fetchData = productMultifinance.sendDetailProduct(id).getDetail();
+
+            case "TLP":
+                fetchData = productTelephone.sendDetailProduct(id).getDetail();
         }
 
         return fetchData;
