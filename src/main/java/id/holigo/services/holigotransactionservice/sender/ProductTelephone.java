@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import id.holigo.services.common.model.DetailProductTransaction;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ProductTelephone {
     
     @Autowired
@@ -27,6 +29,7 @@ public class ProductTelephone {
     private final ObjectMapper objectMapper;
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
+        log.info("Trying Sending TLP -> {}", id);
         DetailProductTransaction detailProductTransaction = DetailProductTransaction.builder().id(id).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_TLP_TRANSACTION, new MessageCreator() {
             @Override
@@ -44,7 +47,9 @@ public class ProductTelephone {
 
         DetailProductTransaction productTransaction = new DetailProductTransaction();
         try{
+            log.info("Listen String Data -> {}", message.getBody(String.class));
             productTransaction = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
+            log.info("Listen Data Mapper -> {}", productTransaction);
         }catch(Exception e){
             e.printStackTrace();
         }
