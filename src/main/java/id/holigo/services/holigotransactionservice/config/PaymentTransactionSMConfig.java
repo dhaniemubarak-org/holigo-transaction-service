@@ -24,7 +24,7 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
 
     @Override
     public void configure(StateMachineStateConfigurer<PaymentStatusEnum, PaymentStatusEvent> states) throws Exception {
-        states.withStates().initial(PaymentStatusEnum.WAITING_PAYMENT)
+        states.withStates().initial(PaymentStatusEnum.SELECTING_PAYMENT)
                 .states(EnumSet.allOf(PaymentStatusEnum.class))
                 .end(PaymentStatusEnum.PAYMENT_FAILED)
                 .end(PaymentStatusEnum.PAYMENT_CANCELED)

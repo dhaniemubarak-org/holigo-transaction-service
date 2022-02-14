@@ -41,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
         private final OrderStatusTransactionService orderStatusTransactionService;
 
         @Override
-        public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest) {
+        public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest, Long userId) {
                 TransactionPaginateForUser transactionPaginateForUser;
                 Page<Transaction> transactionPage;
 

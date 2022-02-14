@@ -41,9 +41,9 @@ public class TransactionDtoForUser {
 
     private UUID paymentId;
 
-    private PaymentStatusEnum statusPayment;
+    private PaymentStatusEnum paymentStatus;
 
-    private OrderStatusEnum statusOrder;
+    private OrderStatusEnum orderStatus;
 
     private Object detail;
 }
