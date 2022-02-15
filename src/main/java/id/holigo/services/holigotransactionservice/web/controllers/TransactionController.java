@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.jms.JMSException;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,8 @@ public class TransactionController {
         }
 
         TransactionPaginateForUser transactionList = transactionService
-                .listTransactionForUser(userId, PageRequest.of(pageNumber, pageSize));
+                .listTransactionForUser(userId, PageRequest.of(pageNumber, pageSize,
+                        Sort.by("createdAt").descending()));
 
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }
