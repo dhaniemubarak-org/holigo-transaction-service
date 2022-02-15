@@ -2,6 +2,7 @@ package id.holigo.services.holigotransactionservice.web.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import id.holigo.services.common.model.OrderStatusEnum;
@@ -16,10 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TransactionDtoForUser {
-    
-    private UUID id;
 
-    private String shortId;
+    private UUID id;
 
     private Timestamp createdAt;
 
@@ -46,4 +45,7 @@ public class TransactionDtoForUser {
     private OrderStatusEnum orderStatus;
 
     private Object detail;
+
+    @Builder.Default
+    private Timestamp serverTime = Timestamp.valueOf(LocalDateTime.now());
 }
