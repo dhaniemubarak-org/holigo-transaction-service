@@ -44,27 +44,29 @@ public class TransactionController {
         }
 
         TransactionPaginateForUser transactionList = transactionService
-                .listTransactionForUser(PageRequest.of(pageNumber, pageSize), userId);
+                .listTransactionForUser(userId, PageRequest.of(pageNumber, pageSize));
 
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }
 
-    @GetMapping(path = { "/api/v1/transactions/{id}"})
+    @GetMapping(path = { "/api/v1/transactions/{id}" })
     @Transactional
-    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException{
+    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException {
         TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
-        
-        if(transactionDtoForUser != null){
+
+        if (transactionDtoForUser != null) {
             return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(transactionDtoForUser, HttpStatus.NOT_FOUND); 
+        return new ResponseEntity<>(transactionDtoForUser, HttpStatus.NOT_FOUND);
     }
 
     // @GetMapping(path = { "/api/v1/transactions/{id}/product" })
-    // public ResponseEntity<DetailProductDtoForUser> getDetailProductTransaction(@PathVariable("id") UUID id)
-    //         throws JMSException {
-    //     DetailProductDtoForUser detailProduct = transactionService.detailProductTransaction(id);
-    //     return new ResponseEntity<>(detailProduct, HttpStatus.OK);
+    // public ResponseEntity<DetailProductDtoForUser>
+    // getDetailProductTransaction(@PathVariable("id") UUID id)
+    // throws JMSException {
+    // DetailProductDtoForUser detailProduct =
+    // transactionService.detailProductTransaction(id);
+    // return new ResponseEntity<>(detailProduct, HttpStatus.OK);
     // }
 }

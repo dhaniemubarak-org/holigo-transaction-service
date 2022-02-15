@@ -11,7 +11,7 @@ import id.holigo.services.holigotransactionservice.web.model.TransactionPaginate
 
 public interface TransactionService {
 
-    TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest, Long userId);
+    TransactionPaginateForUser listTransactionForUser(Long userId, PageRequest pageRequest);
 
     TransactionDto createNewTransaction(TransactionDto transactionDto);
 

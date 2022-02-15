@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -16,6 +16,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Optional<Transaction> findByTransactionIdAndTransactionType(String transactionId, String transactionType);
 
-    Page<Transaction> findAllByUserId(PageRequest pageRequest, Long userId);
+    Page<Transaction> findAllByUserId(Long userId, Pageable pageable);
 }
- 

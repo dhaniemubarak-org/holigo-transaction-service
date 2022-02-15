@@ -41,11 +41,11 @@ public class TransactionServiceImpl implements TransactionService {
         private final OrderStatusTransactionService orderStatusTransactionService;
 
         @Override
-        public TransactionPaginateForUser listTransactionForUser(PageRequest pageRequest, Long userId) {
+        public TransactionPaginateForUser listTransactionForUser(Long userId, PageRequest pageRequest) {
                 TransactionPaginateForUser transactionPaginateForUser;
                 Page<Transaction> transactionPage;
 
-                transactionPage = transactionRepository.findAll(pageRequest);
+                transactionPage = transactionRepository.findAllByUserId(userId, pageRequest);
 
                 transactionPaginateForUser = new TransactionPaginateForUser(
                                 transactionPage.getContent().stream()
