@@ -113,7 +113,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.ISSUED_FAILED)
                 .event(OrderStatusEvent.ISSUED_FAIL)
                 .and()
-                .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.WAITING_ISSEUD)
+                .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.WAITING_ISSUED)
                 .event(OrderStatusEvent.WAITING_ISSUED)
                 .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.RETRYING_ISSUED)
