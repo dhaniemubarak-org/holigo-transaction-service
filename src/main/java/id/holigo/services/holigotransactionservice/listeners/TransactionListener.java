@@ -108,7 +108,7 @@ public class TransactionListener {
                     orderStatusTransactionService.retryingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
-                case WAITING_ISSEUD:
+                case WAITING_ISSUED:
                     log.info("Switch to WAITING_ISSUED");
                     orderStatusTransactionService.waitingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
@@ -119,6 +119,7 @@ public class TransactionListener {
                 case PROCESS_ISSUED:
                 case ORDER_EXPIRED:
                 case ORDER_CANCELED:
+                case ORDER_FINISHED:
                     break;
 
             }
