@@ -39,7 +39,7 @@ public class TransactionServiceImplTest {
     void testCreateNewTransaction() {
         TransactionDto savedTransactionDto = transactionService.createNewTransaction(transactionDto);
 
-        assertEquals(PaymentStatusEnum.WAITING_PAYMENT, savedTransactionDto.getPaymentStatus());
+        assertEquals(PaymentStatusEnum.SELECTING_PAYMENT, savedTransactionDto.getPaymentStatus());
 
         assertEquals(OrderStatusEnum.BOOKED, savedTransactionDto.getOrderStatus());
     }

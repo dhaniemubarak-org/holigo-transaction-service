@@ -39,7 +39,7 @@ public class PaymentStatusTransactionServiceImplTest {
                 .discountAmount(new BigDecimal(0.00)).expiredAt(Timestamp.valueOf(LocalDateTime.now()))
                 .fareAmount(new BigDecimal(98500.00)).nraAmount(new BigDecimal(500.00)).ntaAmount(new BigDecimal(98000))
                 .productId(10).serviceId(13).orderStatus(OrderStatusEnum.PROCESS_BOOK)
-                .paymentStatus(PaymentStatusEnum.WAITING_PAYMENT).transactionId("77763746").transactionType("PRA")
+                .paymentStatus(PaymentStatusEnum.SELECTING_PAYMENT).transactionId("77763746").transactionType("PRA")
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class PaymentStatusTransactionServiceImplTest {
     void testTransactionHasBeenPaid() {
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        assertEquals(PaymentStatusEnum.WAITING_PAYMENT, savedTransaction.getPaymentStatus());
+        assertEquals(PaymentStatusEnum.SELECTING_PAYMENT, savedTransaction.getPaymentStatus());
 
         orderStatusTransactionService.bookingSuccess(savedTransaction.getId());
 
