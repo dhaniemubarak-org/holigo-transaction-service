@@ -20,6 +20,8 @@ public class TransactionDtoForUser {
 
     private UUID id;
 
+    private String invoiceNumber;
+
     private Timestamp createdAt;
 
     private Timestamp expiredAt;
