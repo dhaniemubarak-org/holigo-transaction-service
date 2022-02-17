@@ -119,7 +119,6 @@ public class TransactionListener {
                 case PROCESS_ISSUED:
                 case ORDER_EXPIRED:
                 case ORDER_CANCELED:
-                case ORDER_FINISHED:
                     break;
 
             }

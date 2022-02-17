@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,8 +61,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         @Override
         public TransactionDto createNewTransaction(TransactionDto transactionDto) {
+                transactionDto.setInvoiceNumber(generateInvoiceNumber(transactionDto));
                 transactionDto.setOrderStatus(OrderStatusEnum.PROCESS_BOOK);
-                transactionDto.setPaymentStatus(PaymentStatusEnum.WAITING_PAYMENT);
+                transactionDto.setPaymentStatus(PaymentStatusEnum.SELECTING_PAYMENT);
                 Transaction savedTransaction = transactionRepository
                                 .save(transactionMapper.transactionDtoToTransaction(transactionDto));
                 orderStatusTransactionService.bookingSuccess(savedTransaction.getId());
@@ -95,6 +97,15 @@ public class TransactionServiceImpl implements TransactionService {
                         return transactionDtoForUser;
                 }
                 return null;
+        }
+
+        private String generateInvoiceNumber(TransactionDto transactionDto) {
+
+                String invoiceNumber = transactionDto.getServiceId().toString() + "/"
+                                + transactionDto.getCreatedAt().toLocalDateTime()
+                                                .format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                                + "/" + transactionDto.getTransactionId();
+                return invoiceNumber;
         }
 
 }

@@ -43,8 +43,8 @@ public class Transaction {
     @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
     private UUID parentId;
 
-    @Column(columnDefinition = "varchar(10)", nullable = true)
-    private String shortId;
+    @Column(nullable = true)
+    private String invoiceNumber;
 
     private Long userId;
 
