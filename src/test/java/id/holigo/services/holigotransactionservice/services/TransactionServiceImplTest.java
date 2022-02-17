@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,5 +43,12 @@ public class TransactionServiceImplTest {
         assertEquals(PaymentStatusEnum.SELECTING_PAYMENT, savedTransactionDto.getPaymentStatus());
 
         assertEquals(OrderStatusEnum.BOOKED, savedTransactionDto.getOrderStatus());
+
+        String invoiceNumber = savedTransactionDto.getServiceId().toString()
+                + "/" + savedTransactionDto.getCreatedAt().toLocalDateTime()
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
+                + "/" + savedTransactionDto.getTransactionId();
+        assertEquals(invoiceNumber, savedTransactionDto.getInvoiceNumber());
+
     }
 }

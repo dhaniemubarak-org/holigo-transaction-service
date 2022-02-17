@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,8 +103,7 @@ public class TransactionServiceImpl implements TransactionService {
         private String generateInvoiceNumber(TransactionDto transactionDto) {
 
                 String invoiceNumber = transactionDto.getServiceId().toString() + "/"
-                                + transactionDto.getCreatedAt().toLocalDateTime()
-                                                .format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
                                 + "/" + transactionDto.getTransactionId();
                 return invoiceNumber;
         }
