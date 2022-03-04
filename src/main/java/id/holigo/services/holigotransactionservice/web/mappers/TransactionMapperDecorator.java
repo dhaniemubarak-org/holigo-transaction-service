@@ -26,8 +26,8 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
 
     public TransactionDtoForUser transactionToTransactionDtoForUser(Transaction transaction) {
         TransactionDtoForUser transactionDtoForUser = transactionMapper.transactionToTransactionDtoForUser(transaction);
-        if (transactionDtoForUser.getTransactionId() != null) {
 
+        if (transactionDtoForUser.getPaymentId() != null) {
             transactionDtoForUser.setPayment(paymentService.getPayment(transactionDtoForUser.getPaymentId()));
         }
         return transactionDtoForUser;
