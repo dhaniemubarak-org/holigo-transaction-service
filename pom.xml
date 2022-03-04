@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>id.holigo.services</groupId>
 	<artifactId>holigo-transaction-service</artifactId>
-	<version>1.6.6</version>
+	<version>1.6.7</version>
 	<name>holigo-transaction-service</name>
 	<description>Holigo transaction service</description>
 	<properties>
@@ -100,6 +100,10 @@
 			<groupId>org.springframework.statemachine</groupId>
 			<artifactId>spring-statemachine-core</artifactId>
 			<version>${spring-statemachine.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
