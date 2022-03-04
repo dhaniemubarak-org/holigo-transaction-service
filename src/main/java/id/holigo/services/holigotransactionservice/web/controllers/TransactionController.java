@@ -62,13 +62,4 @@ public class TransactionController {
 
         return new ResponseEntity<>(transactionDtoForUser, HttpStatus.NOT_FOUND);
     }
-
-    // @GetMapping(path = { "/api/v1/transactions/{id}/product" })
-    // public ResponseEntity<DetailProductDtoForUser>
-    // getDetailProductTransaction(@PathVariable("id") UUID id)
-    // throws JMSException {
-    // DetailProductDtoForUser detailProduct =
-    // transactionService.detailProductTransaction(id);
-    // return new ResponseEntity<>(detailProduct, HttpStatus.OK);
-    // }
 }

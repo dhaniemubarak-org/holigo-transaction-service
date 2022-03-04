@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +42,8 @@ public class TransactionDtoForUser {
     private String transactionType;
 
     private UUID paymentId;
+
+    private PaymentDtoForUser payment;
 
     private PaymentStatusEnum paymentStatus;
 
