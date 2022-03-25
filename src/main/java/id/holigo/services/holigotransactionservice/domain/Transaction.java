@@ -62,39 +62,16 @@ public class Transaction {
     private Timestamp expiredAt;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal discountAmount;
-
-    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal fareAmount;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal ntaAmount;
+    private BigDecimal adminAmount;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal nraAmount;
+    private BigDecimal discountAmount;
 
-    private Integer serviceId;
-
-    private Integer productId;
-
-    @Column(name = "index_user")
-    private String indexUser;
-
-    @Lob
-    @Column(name = "index_commission")
-    private String indexCommission;
-
-    @Lob
-    @Column(name = "index_product")
-    private String indexProduct;
-
-    private String transactionId;
-
-    private String transactionType;
-
-    @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    private UUID paymentId;
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal pointAmount;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatusEnum paymentStatus;
@@ -102,6 +79,66 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum orderStatus;
 
+    private String transactionId;
+
+    private String transactionType;
+
+    private Integer serviceId;
+
+    private Integer productId;
+
+    @Lob
+    @Column(name = "index_product")
+    private String indexProduct;
+
+    @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    private UUID paymentId;
+
+    @Column(length = 10, columnDefinition = "varchar(10)", nullable = true)
+    private String paymentServiceId;
+
+    private String voucherCode;
+
+    @Column(name = "index_user")
+    private String indexUser;
+
     private String note;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal ntaAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal nraAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal cpAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal mpAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal ipAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal hpAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal hvAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal prAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal ipcAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal hpcAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal prcAmount;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal mucAmount;
 
 }

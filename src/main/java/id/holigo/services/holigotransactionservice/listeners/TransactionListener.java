@@ -157,6 +157,9 @@ public class TransactionListener {
             Transaction transaction = fetchTransaction.get();
             transaction.setPaymentId(transactionDto.getPaymentId());
             transaction.setPaymentStatus(transactionDto.getPaymentStatus());
+            transaction.setPointAmount(transactionDto.getPointAmount());
+            transaction.setPaymentServiceId(transactionDto.getPaymentServiceId());
+            transaction.setVoucherCode(transactionDto.getVoucherCode());
             transactionRepository.save(transaction);
         }
     }
