@@ -136,9 +136,9 @@ public class Transaction {
     private BigDecimal hpcAmount;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal prcAmount;
-
-    @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal mucAmount;
+    private BigDecimal prcAmount;    
+    
+    @Column(columnDefinition = "decimal(10,2) default 0")
+    private BigDecimal lossAmount;
 
 }

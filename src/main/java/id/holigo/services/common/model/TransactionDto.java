@@ -88,5 +88,5 @@ public class TransactionDto implements Serializable {
 
     private BigDecimal prcAmount;
 
-    private BigDecimal mucAmount;
+    private BigDecimal lossAmount;
 }
