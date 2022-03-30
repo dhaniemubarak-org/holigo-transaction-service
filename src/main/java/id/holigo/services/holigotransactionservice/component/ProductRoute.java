@@ -59,7 +59,7 @@ public class ProductRoute {
     private final ProductCreditcard productCreditcard;
 
     @Transactional
-    public Object getDetailProduct(String transactionType, Long id) throws JMSException {
+    public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
         Object fetchData = null;
         log.info("Transaction Type -> {}", transactionType);
         switch (transactionType) {
@@ -67,7 +67,7 @@ public class ProductRoute {
             case "PUL":
             case "PD":
             case "PR":
-                fetchData = productPulsa.sendDetailProduct(id).getDetail();
+                fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
                 break;
 
             case "PRA":

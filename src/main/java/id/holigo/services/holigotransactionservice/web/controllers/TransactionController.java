@@ -53,8 +53,9 @@ public class TransactionController {
 
     @GetMapping(path = { "/api/v1/transactions/{id}" })
     @Transactional
-    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException {
-        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
+    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id,
+            @RequestHeader("accept-language") String locale) throws JMSException {
+        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id, locale);
 
         if (transactionDtoForUser != null) {
             return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -34,6 +35,8 @@ public class TransactionDtoForUser {
     private BigDecimal ntaAmount;
 
     private BigDecimal nraAmount;
+
+    private BigDecimal hpAmount;
 
     private String indexProduct;
 

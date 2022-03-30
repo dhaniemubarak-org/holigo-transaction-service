@@ -30,7 +30,7 @@ public class ProductPulsa {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public DetailProductTransaction sendDetailProduct(Long productId) throws JMSException {
+    public DetailProductTransaction sendDetailProduct(Long productId, String locale) throws JMSException {
         System.out.println("SENDINGDETAILPRODUCT!");
         DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(productId).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_TRANSACTION_PULSA, new MessageCreator() {
@@ -40,6 +40,7 @@ public class ProductPulsa {
                 try {
                     message = session.createTextMessage(objectMapper.writeValueAsString(productTransaction));
                     message.setStringProperty("_type", "id.holigo.services.common.model.DetailProductTransaction");
+                    message.setStringProperty("locale", locale);
                     return message;
                 } catch (JsonProcessingException e) {
                     throw new JMSException("Error Sending Detail Product Pulsa!");

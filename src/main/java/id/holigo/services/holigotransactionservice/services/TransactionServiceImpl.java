@@ -84,7 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         @Override
         @Transactional
-        public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
+        public TransactionDtoForUser getTransactionByIdForUser(UUID id, String locale) throws JMSException {
                 Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
                 if (fetchTransaction.isPresent()) {
                         TransactionDtoForUser transactionDtoForUser = transactionMapper
@@ -92,7 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                         Object detailProduct = productRoute.getDetailProduct(
                                         transactionDtoForUser.getTransactionType(),
-                                        Long.valueOf(transactionDtoForUser.getTransactionId()));
+                                        Long.valueOf(transactionDtoForUser.getTransactionId()), locale);
 
                         transactionDtoForUser.setDetail(detailProduct);
                         return transactionDtoForUser;
