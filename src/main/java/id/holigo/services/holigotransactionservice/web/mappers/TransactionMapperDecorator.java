@@ -2,6 +2,7 @@ package id.holigo.services.holigotransactionservice.web.mappers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
@@ -28,7 +29,10 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
         TransactionDtoForUser transactionDtoForUser = transactionMapper.transactionToTransactionDtoForUser(transaction);
 
         if (transactionDtoForUser.getPaymentId() != null) {
-            transactionDtoForUser.setPayment(paymentService.getPayment(transactionDtoForUser.getPaymentId()));
+            PaymentDtoForUser paymentDtoForUser = paymentService.getPayment(transactionDtoForUser.getPaymentId());
+            paymentDtoForUser.setDetailRoute("/api/v1/payments/" + paymentDtoForUser.getId().toString() + "/"
+                    + paymentDtoForUser.getDetailType() + "/" + paymentDtoForUser.getDetailId());
+            transactionDtoForUser.setPayment(paymentDtoForUser);
         }
         return transactionDtoForUser;
     }
