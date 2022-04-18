@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.jms.JMSException;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -53,9 +54,9 @@ public class TransactionController {
 
     @GetMapping(path = { "/api/v1/transactions/{id}" })
     @Transactional
-    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id,
-            @RequestHeader("accept-language") String locale) throws JMSException {
-        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id, locale);
+    public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException {
+        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id,
+                LocaleContextHolder.getLocale().toString());
 
         if (transactionDtoForUser != null) {
             return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
