@@ -31,7 +31,7 @@ public class TransactionController {
     private static final Integer DEFAULT_PAGE_NUMBER = 0;
     private static final Integer DEFAULT_PAGE_SIZE = 25;
 
-    @GetMapping(path = { "/api/v1/transactions" })
+    @GetMapping(path = {"/api/v1/transactions"})
     public ResponseEntity<TransactionPaginateForUser> getAllTransactions(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
@@ -52,16 +52,13 @@ public class TransactionController {
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
     }
 
-    @GetMapping(path = { "/api/v1/transactions/{id}" })
+    @GetMapping(path = {"/api/v1/transactions/{id}"})
     @Transactional
     public ResponseEntity<TransactionDtoForUser> getDetailTransaction(@PathVariable("id") UUID id) throws JMSException {
-        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id,
-                LocaleContextHolder.getLocale().toString());
-
+        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
         if (transactionDtoForUser != null) {
             return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
         }
-
-        return new ResponseEntity<>(transactionDtoForUser, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

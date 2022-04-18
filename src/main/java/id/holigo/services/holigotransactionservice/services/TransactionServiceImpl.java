@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.jms.JMSException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -84,7 +85,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         @Override
         @Transactional
-        public TransactionDtoForUser getTransactionByIdForUser(UUID id, String locale) throws JMSException {
+        public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
                 Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
                 if (fetchTransaction.isPresent()) {
                         TransactionDtoForUser transactionDtoForUser = transactionMapper
@@ -92,7 +93,7 @@ public class TransactionServiceImpl implements TransactionService {
 
                         Object detailProduct = productRoute.getDetailProduct(
                                         transactionDtoForUser.getTransactionType(),
-                                        Long.valueOf(transactionDtoForUser.getTransactionId()), locale);
+                                        Long.valueOf(transactionDtoForUser.getTransactionId()), LocaleContextHolder.getLocale().toString());
 
                         transactionDtoForUser.setDetail(detailProduct);
                         return transactionDtoForUser;

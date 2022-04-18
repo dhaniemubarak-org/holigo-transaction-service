@@ -17,6 +17,6 @@ public interface TransactionService {
 
     TransactionDto getTransactionById(UUID id);
 
-    TransactionDtoForUser getTransactionByIdForUser(UUID id, String locale) throws JMSException;
+    TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException;
 
 }
