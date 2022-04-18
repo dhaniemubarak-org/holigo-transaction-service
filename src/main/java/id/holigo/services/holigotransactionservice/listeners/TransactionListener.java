@@ -5,6 +5,11 @@ import java.util.Optional;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import com.netflix.discovery.converters.Auto;
+import id.holigo.services.common.model.IncrementUserClubDto;
+import id.holigo.services.common.model.UpdateUserPointDto;
+import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
+import id.holigo.services.holigotransactionservice.services.point.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
@@ -54,10 +59,16 @@ public class TransactionListener {
     @Autowired
     private final PaymentService paymentService;
 
+    @Autowired
+    private final HoliclubService holiclubService;
+
+    @Autowired
+    private final PointService pointService;
+
     @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
     public void listenForCreateNewTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
-            Message message) throws JmsException, JMSException {
+                                              Message message) throws JmsException, JMSException {
 
         TransactionDto transaction = transactionService.createNewTransaction(transactionDto);
 
@@ -66,7 +77,7 @@ public class TransactionListener {
 
     @JmsListener(destination = JmsConfig.GET_TRANSACTION_BY_ID)
     public void listenForGetTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
-            Message message) throws JmsException, JMSException {
+                                        Message message) throws JmsException, JMSException {
         log.info("listen for get transaction ....");
         TransactionDto transaction = transactionService.getTransactionById(transactionDto.getId());
         log.info("transaction -> {}", transaction);
@@ -97,6 +108,14 @@ public class TransactionListener {
                     log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
+                    IncrementUserClubDto incrementUserClubDto = IncrementUserClubDto.builder()
+                            .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
+                            .fareAmount(transaction.getFareAmount()).build();
+                    holiclubService.incrementUserClub(incrementUserClubDto);
+                    UpdateUserPointDto updateUserPointDto = UpdateUserPointDto.builder()
+                            .userId(transaction.getUserId()).credit(0).debit(transaction.getHpAmount().intValue())
+                            .invoiceNumber(transaction.getInvoiceNumber()).build();
+                    pointService.updateUserPoint(updateUserPointDto);
                     break;
                 case ISSUED_FAILED:
                     log.info("Switch to ISSUED_FAILED");
