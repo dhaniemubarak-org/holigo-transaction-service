@@ -12,9 +12,7 @@ import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -26,7 +24,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void transactionIssued(TransactionDto transactionDto) {
-        log.info("transactionIssued is running...");
         jmsTemplate.convertAndSend(JmsConfig.UPDATE_PAYMENT_STATUS_BY_PAYMENT_ID, new TransactionEvent(transactionDto));
     }
 

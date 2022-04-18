@@ -4,17 +4,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.2</version>
+		<version>2.6.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>id.holigo.services</groupId>
 	<artifactId>holigo-transaction-service</artifactId>
-	<version>1.6.11</version>
+	<version>1.9.0</version>
 	<name>holigo-transaction-service</name>
 	<description>Holigo transaction service</description>
 	<properties>
 		<java.version>17</java.version>
-		<spring-cloud.version>2021.0.0</spring-cloud.version>
+		<spring-cloud.version>2021.0.1</spring-cloud.version>
 		<spring-statemachine.version>2.2.3.RELEASE</spring-statemachine.version>
 		<docker.image.prefix>holigo</docker.image.prefix>
 		<docker.image.name>${project.artifactId}</docker.image.name>

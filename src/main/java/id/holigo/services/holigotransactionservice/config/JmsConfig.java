@@ -37,6 +37,10 @@ public class JmsConfig {
     public static final String ISSUED_POSTPAID_CC_BY_ID = "issued-postpaid-cc-by-id";
     public static final String DETAIL_PRODUCT_CC_TRANSACTION = "detail-product-cc-transaction";
 
+    public static final String INCREMENT_USERCLUB_BY_USER_ID_QUEUE = "increment-userclub-by-user-id";
+
+    public static final String UPDATE_POINT_BY_USER_ID_QUEUE = "update-point-by-user-id-queue";
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

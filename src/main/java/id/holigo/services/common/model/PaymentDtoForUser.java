@@ -37,4 +37,6 @@ public class PaymentDtoForUser implements Serializable {
 
     private String detailType;
 
+    private String detailRoute;
+
 }

@@ -6,9 +6,11 @@ import org.mapstruct.Mapper;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
+import org.springframework.stereotype.Component;
 
 @DecoratedWith(TransactionMapperDecorator.class)
 @Mapper
+@Component
 public interface TransactionMapper {
 
     Transaction transactionDtoForUserToTransaction(TransactionDtoForUser transactionDtoForUser);
