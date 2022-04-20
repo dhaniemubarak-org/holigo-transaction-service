@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -30,83 +31,86 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-        public static final String TRANSACTION_HEADER = "payment_id";
+    public static final String TRANSACTION_HEADER = "payment_id";
 
-        @Autowired
-        private final TransactionRepository transactionRepository;
+    @Autowired
+    private final TransactionRepository transactionRepository;
 
-        @Autowired
-        private final TransactionMapper transactionMapper;
+    @Autowired
+    private final TransactionMapper transactionMapper;
 
-        @Autowired
-        private final ProductRoute productRoute;
+    @Autowired
+    private final ProductRoute productRoute;
 
-        private final OrderStatusTransactionService orderStatusTransactionService;
+    private final OrderStatusTransactionService orderStatusTransactionService;
 
-        @Override
-        public TransactionPaginateForUser listTransactionForUser(Long userId, PageRequest pageRequest) {
-                TransactionPaginateForUser transactionPaginateForUser;
-                Page<Transaction> transactionPage;
+    @Override
+    public TransactionPaginateForUser listTransactionForUser(Long userId, PageRequest pageRequest) {
+        TransactionPaginateForUser transactionPaginateForUser;
+        Page<Transaction> transactionPage;
 
-                transactionPage = transactionRepository.findAllByUserId(userId, pageRequest);
+        transactionPage = transactionRepository.findAllByUserId(userId, pageRequest);
 
-                transactionPaginateForUser = new TransactionPaginateForUser(
-                                transactionPage.getContent().stream()
-                                                .map(transactionMapper::transactionToTransactionDtoForUser)
-                                                .collect(Collectors.toList()),
-                                PageRequest.of(transactionPage.getPageable().getPageNumber(),
-                                                transactionPage.getPageable().getPageSize()),
-                                transactionPage.getTotalElements());
+        transactionPaginateForUser = new TransactionPaginateForUser(
+                transactionPage.getContent().stream()
+                        .map(transactionMapper::transactionToTransactionDtoForUser)
+                        .collect(Collectors.toList()),
+                PageRequest.of(transactionPage.getPageable().getPageNumber(),
+                        transactionPage.getPageable().getPageSize()),
+                transactionPage.getTotalElements());
 
-                return transactionPaginateForUser;
+        return transactionPaginateForUser;
+    }
+
+    @Override
+    public TransactionDto createNewTransaction(TransactionDto transactionDto) {
+        if (transactionDto.getExpiredAt() == null) {
+            transactionDto.setExpiredAt(Timestamp.valueOf(LocalDateTime.now().plusHours(2)));
         }
+        transactionDto.setInvoiceNumber(generateInvoiceNumber(transactionDto));
+        transactionDto.setOrderStatus(OrderStatusEnum.PROCESS_BOOK);
+        transactionDto.setPaymentStatus(PaymentStatusEnum.SELECTING_PAYMENT);
+        Transaction savedTransaction = transactionRepository
+                .save(transactionMapper.transactionDtoToTransaction(transactionDto));
+        orderStatusTransactionService.bookingSuccess(savedTransaction.getId());
+        return transactionMapper.transactionToTransactionDto(savedTransaction);
+    }
 
-        @Override
-        public TransactionDto createNewTransaction(TransactionDto transactionDto) {
-                transactionDto.setInvoiceNumber(generateInvoiceNumber(transactionDto));
-                transactionDto.setOrderStatus(OrderStatusEnum.PROCESS_BOOK);
-                transactionDto.setPaymentStatus(PaymentStatusEnum.SELECTING_PAYMENT);
-                Transaction savedTransaction = transactionRepository
-                                .save(transactionMapper.transactionDtoToTransaction(transactionDto));
-                orderStatusTransactionService.bookingSuccess(savedTransaction.getId());
-                return transactionMapper.transactionToTransactionDto(savedTransaction);
+    @Override
+    public TransactionDto getTransactionById(UUID id) {
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
+        if (fetchTransaction.isPresent()) {
+            TransactionDto transactionDto = transactionMapper
+                    .transactionToTransactionDto(fetchTransaction.get());
+            return transactionDto;
         }
+        return null;
+    }
 
-        @Override
-        public TransactionDto getTransactionById(UUID id) {
-                Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
-                if (fetchTransaction.isPresent()) {
-                        TransactionDto transactionDto = transactionMapper
-                                        .transactionToTransactionDto(fetchTransaction.get());
-                        return transactionDto;
-                }
-                return null;
+    @Override
+    @Transactional
+    public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
+        if (fetchTransaction.isPresent()) {
+            TransactionDtoForUser transactionDtoForUser = transactionMapper
+                    .transactionToTransactionDtoForUser(fetchTransaction.get());
+
+            Object detailProduct = productRoute.getDetailProduct(
+                    transactionDtoForUser.getTransactionType(),
+                    Long.valueOf(transactionDtoForUser.getTransactionId()), LocaleContextHolder.getLocale().toString());
+
+            transactionDtoForUser.setDetail(detailProduct);
+            return transactionDtoForUser;
         }
+        return null;
+    }
 
-        @Override
-        @Transactional
-        public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
-                Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
-                if (fetchTransaction.isPresent()) {
-                        TransactionDtoForUser transactionDtoForUser = transactionMapper
-                                        .transactionToTransactionDtoForUser(fetchTransaction.get());
+    private String generateInvoiceNumber(TransactionDto transactionDto) {
 
-                        Object detailProduct = productRoute.getDetailProduct(
-                                        transactionDtoForUser.getTransactionType(),
-                                        Long.valueOf(transactionDtoForUser.getTransactionId()), LocaleContextHolder.getLocale().toString());
-
-                        transactionDtoForUser.setDetail(detailProduct);
-                        return transactionDtoForUser;
-                }
-                return null;
-        }
-
-        private String generateInvoiceNumber(TransactionDto transactionDto) {
-
-                String invoiceNumber = transactionDto.getServiceId().toString() + "/"
-                                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
-                                + "/" + transactionDto.getTransactionId();
-                return invoiceNumber;
-        }
+        String invoiceNumber = transactionDto.getServiceId().toString() + "/"
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
+                + "/" + transactionDto.getTransactionId();
+        return invoiceNumber;
+    }
 
 }
