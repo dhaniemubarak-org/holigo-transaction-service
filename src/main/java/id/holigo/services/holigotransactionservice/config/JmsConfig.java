@@ -41,6 +41,8 @@ public class JmsConfig {
 
     public static final String UPDATE_POINT_BY_USER_ID_QUEUE = "update-point-by-user-id-queue";
 
+    public static final String DETAIL_PRODUCT_HOTEL_TRANSACTION = "detail-product-hotel-transaction";
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

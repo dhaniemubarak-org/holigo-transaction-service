@@ -2,21 +2,11 @@ package id.holigo.services.holigotransactionservice.component;
 
 import javax.jms.JMSException;
 
+import id.holigo.services.holigotransactionservice.sender.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import id.holigo.services.holigotransactionservice.sender.ProductCreditcard;
-import id.holigo.services.holigotransactionservice.sender.ProductEwallet;
-import id.holigo.services.holigotransactionservice.sender.ProductGame;
-import id.holigo.services.holigotransactionservice.sender.ProductInsurance;
-import id.holigo.services.holigotransactionservice.sender.ProductMultifinance;
-import id.holigo.services.holigotransactionservice.sender.ProductNetv;
-import id.holigo.services.holigotransactionservice.sender.ProductPLNPAS;
-import id.holigo.services.holigotransactionservice.sender.ProductPLNPRE;
-import id.holigo.services.holigotransactionservice.sender.ProductPdam;
-import id.holigo.services.holigotransactionservice.sender.ProductPulsa;
-import id.holigo.services.holigotransactionservice.sender.ProductTelephone;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,6 +47,9 @@ public class ProductRoute {
 
     @Autowired
     private final ProductCreditcard productCreditcard;
+
+    @Autowired
+    private  final ProductHotel productHotel;
 
     @Transactional
     public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
@@ -105,6 +98,10 @@ public class ProductRoute {
                 break;
             case "CC":
                 fetchData = productCreditcard.sendDetailProduct(id).getDetail();
+                break;
+
+            case "HTL" :
+                fetchData = productHotel.sendDetailProduct(id).getDetail();
                 break;
         }
 
