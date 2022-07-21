@@ -39,8 +39,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private final TransactionMapper transactionMapper;
 
+
+    private ProductRoute productRoute;
+
     @Autowired
-    private final ProductRoute productRoute;
+    void setProductRoute(ProductRoute productRoute) {
+        this.productRoute = productRoute;
+    }
 
     private final OrderStatusTransactionService orderStatusTransactionService;
 
@@ -107,10 +112,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     private String generateInvoiceNumber(TransactionDto transactionDto) {
 
-        String invoiceNumber = transactionDto.getServiceId().toString() + "/"
+        return transactionDto.getServiceId().toString() + "/"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
                 + "/" + transactionDto.getTransactionId();
-        return invoiceNumber;
     }
 
 }

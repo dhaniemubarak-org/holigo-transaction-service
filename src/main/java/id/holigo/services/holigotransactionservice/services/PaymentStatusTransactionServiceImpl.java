@@ -38,8 +38,16 @@ public class PaymentStatusTransactionServiceImpl implements PaymentStatusTransac
         return sm;
     }
 
+    @Transactional
+    @Override
+    public StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasExpired(UUID transactionId) {
+        StateMachine<PaymentStatusEnum, PaymentStatusEvent> sm = build(transactionId);
+        sendEvent(transactionId, sm, PaymentStatusEvent.PAYMENT_EXPIRED);
+        return sm;
+    }
+
     private void sendEvent(UUID id, StateMachine<PaymentStatusEnum, PaymentStatusEvent> sm,
-            PaymentStatusEvent event) {
+                           PaymentStatusEvent event) {
         Message<PaymentStatusEvent> message = MessageBuilder.withPayload(event)
                 .setHeader(TRANSACTION_HEADER, id).build();
         sm.sendEvent(message);

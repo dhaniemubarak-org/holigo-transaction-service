@@ -1,8 +1,12 @@
 package id.holigo.services.holigotransactionservice.config;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -22,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<PaymentStatusEnum, PaymentStatusEvent> {
 
+    private final OrderStatusTransactionService orderStatusTransactionService;
+
     @Override
     public void configure(StateMachineStateConfigurer<PaymentStatusEnum, PaymentStatusEvent> states) throws Exception {
         states.withStates().initial(PaymentStatusEnum.SELECTING_PAYMENT)
@@ -36,8 +42,11 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
     public void configure(StateMachineTransitionConfigurer<PaymentStatusEnum, PaymentStatusEvent> transitions)
             throws Exception {
         transitions.withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAID)
-                // .action(paidAction())
-                .event(PaymentStatusEvent.PAYMENT_PAID);
+                .event(PaymentStatusEvent.PAYMENT_PAID)
+                .and().withExternal().source(PaymentStatusEnum.SELECTING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
+                .event(PaymentStatusEvent.PAYMENT_EXPIRED).action(paymentExpiredAction())
+                .and().withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
+                .event(PaymentStatusEvent.PAYMENT_EXPIRED);
     }
 
     @Override
@@ -46,10 +55,17 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
         StateMachineListenerAdapter<PaymentStatusEnum, PaymentStatusEvent> adapter = new StateMachineListenerAdapter<>() {
             @Override
             public void stateChanged(State<PaymentStatusEnum, PaymentStatusEvent> from,
-                    State<PaymentStatusEnum, PaymentStatusEvent> to) {
+                                     State<PaymentStatusEnum, PaymentStatusEvent> to) {
                 log.info(String.format("stateChange(from: %s, to %s)", from.getId(), to.getId()));
             }
         };
         config.withConfiguration().listener(adapter);
+    }
+
+    private Action<PaymentStatusEnum, PaymentStatusEvent> paymentExpiredAction() {
+        return stateContext -> {
+            orderStatusTransactionService.expiredTransaction(UUID.fromString(
+                    stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+        };
     }
 }

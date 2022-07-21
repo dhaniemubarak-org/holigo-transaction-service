@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>id.holigo.services</groupId>
 	<artifactId>holigo-transaction-service</artifactId>
-	<version>1.10.0</version>
+	<version>1.10.1</version>
 	<name>holigo-transaction-service</name>
 	<description>Holigo transaction service</description>
 	<properties>
@@ -109,6 +109,10 @@
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
 			<version>7.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,4 +18,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Optional<Transaction> findByTransactionIdAndTransactionType(String transactionId, String transactionType);
 
     Page<Transaction> findAllByUserId(Long userId, Pageable pageable);
+
+    List<Transaction> findAllByPaymentStatusIn(List<PaymentStatusEnum> paymentStatuses);
 }
