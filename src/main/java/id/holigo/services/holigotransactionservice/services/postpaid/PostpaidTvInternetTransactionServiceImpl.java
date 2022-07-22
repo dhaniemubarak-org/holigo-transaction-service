@@ -13,8 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PostpaidTvInternetTransactionServiceImpl implements PostpaidTvInternetTransactionService {
 
-    @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void issuedTransaction(PostpaidTvInternetTransactionDto postpaidTvInternetTransactionDto) {

@@ -13,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PrepaidElectricitiesTransactionServiceImpl implements PrepaidElectricitiesTransactionService {
 
-    @Autowired
     private JmsTemplate jmsTemplate;
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void issuedTransaction(PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto) {

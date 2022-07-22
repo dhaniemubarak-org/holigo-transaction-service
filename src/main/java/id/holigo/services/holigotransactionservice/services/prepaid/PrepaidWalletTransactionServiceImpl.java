@@ -13,11 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PrepaidWalletTransactionServiceImpl implements PrepaidWalletTransactionService {
 
-    @Autowired
     private JmsTemplate jmsTemplate;
 
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
     @Override
-    public void issuedTranasction(PrepaidWalletTransactionDto prepaidWalletTransactionDto) {
+    public void issuedTransaction(PrepaidWalletTransactionDto prepaidWalletTransactionDto) {
         log.info("issuedTransaction is running...");
         log.info("prepaidWalletTransactionDto -> {}", prepaidWalletTransactionDto);
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_PREPAID_WALLET_BY_ID,

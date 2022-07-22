@@ -13,12 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PostpaidCreditCardTransactionServiceImpl implements PostpaidCreditCardTransactionService {
 
-    @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void issuedTransaction(PostpaidCreditcardTransactionDto postpaidCreditcardTransactionDto) {
-        log.info("issuedTransaction is running...");
         log.info("postpaidCreditcardTransactionDto -> {}", postpaidCreditcardTransactionDto);
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_POSTPAID_CC_BY_ID,
                 new IssuedPostpaidCreditcardEvent(postpaidCreditcardTransactionDto));

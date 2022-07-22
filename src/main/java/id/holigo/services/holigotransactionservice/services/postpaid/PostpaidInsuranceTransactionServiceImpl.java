@@ -12,9 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class PostpaidInsuranceTransactionServiceImpl implements PostpaidInsuranceTransactionService {
+    private JmsTemplate jmsTemplate;
 
     @Autowired
-    private JmsTemplate jmsTemplate;
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void issuedTransaction(PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto) {

@@ -195,7 +195,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
-                    prepaidWalletTransactionService.issuedTranasction(prepaidWalletTransactionDto);
+                    prepaidWalletTransactionService.issuedTransaction(prepaidWalletTransactionDto);
                     break;
                 case "NETV":
                     log.info("Issued NETV / DWAL is running...");

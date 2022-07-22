@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TransactionEvent implements Serializable {
 
-    static final long serialVersionUID = -1556695181210L;
+    static final long serialVersionUID = -1581210L;
 
     private TransactionDto transactionDto;
 

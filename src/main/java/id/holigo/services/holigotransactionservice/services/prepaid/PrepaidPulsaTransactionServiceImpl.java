@@ -13,8 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PrepaidPulsaTransactionServiceImpl implements PrepaidPulsaTransactionService {
 
-    @Autowired
     private JmsTemplate jmsTemplate;
+
+    @Autowired
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
 
     @Override
     public void issuedTransaction(PrepaidPulsaTransactionDto prepaidPulsaTransactionDto) {
