@@ -45,7 +45,7 @@ public class PostpaidPdamTransactionDto {
 
     private PaymentStatusEnum paymentStatus;
 
-    private OrderStatusEnum OrderStatus;
+    private OrderStatusEnum orderStatus;
 
     private String device;
 

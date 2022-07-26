@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.repositories;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,5 +20,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Page<Transaction> findAllByUserId(Long userId, Pageable pageable);
 
-    List<Transaction> findAllByPaymentStatusIn(List<PaymentStatusEnum> paymentStatuses);
+    List<Transaction> findAllByPaymentStatusInAndExpiredAtLessThanEqual(List<PaymentStatusEnum> paymentStatuses, Timestamp timestamp);
 }

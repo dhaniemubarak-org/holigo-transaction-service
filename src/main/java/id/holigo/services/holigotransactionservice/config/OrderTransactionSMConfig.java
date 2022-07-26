@@ -132,7 +132,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
         StateMachineListenerAdapter<OrderStatusEnum, OrderStatusEvent> adapter = new StateMachineListenerAdapter<>() {
             @Override
             public void stateChanged(State<OrderStatusEnum, OrderStatusEvent> from,
-                    State<OrderStatusEnum, OrderStatusEvent> to) {
+                                     State<OrderStatusEnum, OrderStatusEvent> to) {
                 log.info(String.format("stateChange(from: %s, to %s)", from.getId(), to.getId()));
             }
         };
@@ -157,7 +157,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     log.info("Issued PAM is running....");
                     PostpaidPdamTransactionDto postpaidPdamTransactionDto = PostpaidPdamTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
-                            .paymentStatus(transaction.getPaymentStatus()).OrderStatus(transaction.getOrderStatus())
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidPdamTransactionService.issuedTransaction(postpaidPdamTransactionDto);
                     break;

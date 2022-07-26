@@ -8,19 +8,15 @@ import java.util.UUID;
 import id.holigo.services.common.model.DeviceTypeEnum;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-public class PostpaidMultifinanceTransactionDto implements Serializable{
+public class PostpaidMultifinanceTransactionDto implements Serializable {
     static final long serialVersionUID = -6512312L;
-    
+
     private Long id;
 
     private Timestamp createdAt;

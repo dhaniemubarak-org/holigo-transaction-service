@@ -21,6 +21,8 @@ public class AirlinesTransactionDtoForUser implements Serializable {
 
     private Long id;
 
+    private String iconUrl;
+
     private Long userId;
 
     private UUID transactionId;
