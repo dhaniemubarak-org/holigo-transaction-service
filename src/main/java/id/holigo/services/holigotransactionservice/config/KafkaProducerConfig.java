@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.config;
 
+import id.holigo.services.common.model.AirlinesTransactionDtoForUser;
 import id.holigo.services.common.model.PaymentDto;
 import id.holigo.services.common.model.creditcard.PostpaidCreditcardTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
@@ -163,6 +164,16 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, HotelTransactionDto> hotelKafkaTemplate(ProducerFactory<String, HotelTransactionDto> hotelTransactionProducer) {
         return new KafkaTemplate<>(hotelTransactionProducer);
+    }
+
+    @Bean
+    public ProducerFactory<String, AirlinesTransactionDtoForUser> airlinesTransactionProducer() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, AirlinesTransactionDtoForUser> airlinesKafkaTemplate(ProducerFactory<String, AirlinesTransactionDtoForUser> airlinesTransactionProducer) {
+        return new KafkaTemplate<>(airlinesTransactionProducer);
     }
 
     @Bean

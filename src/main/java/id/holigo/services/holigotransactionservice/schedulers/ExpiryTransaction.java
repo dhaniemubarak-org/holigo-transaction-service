@@ -1,9 +1,6 @@
 package id.holigo.services.holigotransactionservice.schedulers;
 
-import id.holigo.services.common.model.OrderStatusEnum;
-import id.holigo.services.common.model.PaymentDto;
-import id.holigo.services.common.model.PaymentStatusEnum;
-import id.holigo.services.common.model.TransactionDto;
+import id.holigo.services.common.model.*;
 import id.holigo.services.common.model.creditcard.PostpaidCreditcardTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
@@ -22,7 +19,6 @@ import id.holigo.services.holigotransactionservice.repositories.TransactionRepos
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.sleuth.autoconfig.instrument.messaging.SleuthMessagingProperties;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -50,6 +46,8 @@ public class ExpiryTransaction {
     private final KafkaTemplate<String, PostpaidTelephoneTransactionDto> telephoneKafkaTemplate;
     private final KafkaTemplate<String, HotelTransactionDto> hotelKafkaTemplate;
     private final KafkaTemplate<String, PostpaidCreditcardTransactionDto> ccKafkaTemplate;
+
+    private final KafkaTemplate<String, AirlinesTransactionDtoForUser> airlinesKafkaTemplate;
     private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
 
     @Scheduled(fixedRate = 10000)
@@ -136,7 +134,6 @@ public class ExpiryTransaction {
                             .build());
                     break;
                 case "CC":
-                    log.info("CC kafka is running");
                     ccKafkaTemplate.send(KafkaTopicConfig.UPDATE_CC_TRANSACTION, PostpaidCreditcardTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
@@ -150,9 +147,12 @@ public class ExpiryTransaction {
                             .orderStatus(OrderStatusEnum.ORDER_EXPIRED).build());
                     break;
                 case "AIR":
-
+                    airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
+                            .orderStatus(OrderStatusEnum.ORDER_EXPIRED)
+                            .build());
                     break;
-
             }
         });
     }

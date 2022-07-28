@@ -120,10 +120,10 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .event(OrderStatusEvent.RETRYING_ISSUED)
                 .and()
                 .withExternal().source(OrderStatusEnum.BOOKED).target(OrderStatusEnum.ORDER_CANCELED)
-                .event(OrderStatusEvent.BOOK_CANCEL)
+                .event(OrderStatusEvent.ORDER_CANCEL)
                 .and()
                 .withExternal().source(OrderStatusEnum.BOOKED).target(OrderStatusEnum.ORDER_EXPIRED)
-                .event(OrderStatusEvent.BOOK_EXPIRE);
+                .event(OrderStatusEvent.ORDER_EXPIRE);
     }
 
     @Override

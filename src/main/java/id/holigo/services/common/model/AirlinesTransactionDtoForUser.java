@@ -2,10 +2,7 @@ package id.holigo.services.common.model;
 
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.common.model.TripType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AirlinesTransactionDtoForUser implements Serializable {
 
     private Long id;
@@ -24,8 +22,6 @@ public class AirlinesTransactionDtoForUser implements Serializable {
     private String iconUrl;
 
     private Long userId;
-
-    private UUID transactionId;
 
     private ContactPersonDto contactPerson;
 
@@ -36,6 +32,8 @@ public class AirlinesTransactionDtoForUser implements Serializable {
     private Timestamp expiredAt;
 
     private PaymentStatusEnum paymentStatus;
+
+    private OrderStatusEnum orderStatus;
 
     private BigDecimal fareAmount;
 

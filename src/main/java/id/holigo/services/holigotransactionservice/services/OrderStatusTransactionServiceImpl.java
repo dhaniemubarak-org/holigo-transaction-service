@@ -81,14 +81,14 @@ public class OrderStatusTransactionServiceImpl implements OrderStatusTransaction
     @Override
     public StateMachine<OrderStatusEnum, OrderStatusEvent> cancelTransaction(UUID transactionId) {
         StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
-        sendEvent(transactionId, sm, OrderStatusEvent.BOOK_CANCEL);
+        sendEvent(transactionId, sm, OrderStatusEvent.ORDER_CANCEL);
         return sm;
     }
 
     @Override
     public StateMachine<OrderStatusEnum, OrderStatusEvent> expiredTransaction(UUID transactionId) {
         StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
-        sendEvent(transactionId, sm, OrderStatusEvent.BOOK_EXPIRE);
+        sendEvent(transactionId, sm, OrderStatusEvent.ORDER_EXPIRE);
         return sm;
     }
 

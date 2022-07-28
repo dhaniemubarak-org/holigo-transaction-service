@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import com.netflix.discovery.converters.Auto;
 import id.holigo.services.common.model.IncrementUserClubDto;
 import id.holigo.services.common.model.UpdateUserPointDto;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
