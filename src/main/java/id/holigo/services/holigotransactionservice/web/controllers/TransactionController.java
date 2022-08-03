@@ -4,17 +4,16 @@ import java.util.UUID;
 
 import javax.jms.JMSException;
 
-import org.springframework.context.i18n.LocaleContextHolder;
+import id.holigo.services.common.model.TransactionDto;
+import id.holigo.services.holigotransactionservice.domain.Transaction;
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
+import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import id.holigo.services.holigotransactionservice.services.TransactionService;
 // import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
@@ -30,6 +29,10 @@ public class TransactionController {
 
     private static final Integer DEFAULT_PAGE_NUMBER = 0;
     private static final Integer DEFAULT_PAGE_SIZE = 25;
+
+    private final OrderStatusTransactionService orderStatusTransactionService;
+
+    private final PaymentStatusTransactionService paymentStatusTransactionService;
 
     @GetMapping(path = {"/api/v1/transactions"})
     public ResponseEntity<TransactionPaginateForUser> getAllTransactions(
@@ -60,5 +63,19 @@ public class TransactionController {
             return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping(path = "/api/v1/transactions/{id}")
+    public ResponseEntity<TransactionDtoForUser> cancelTransaction(@PathVariable("id") UUID id, @RequestHeader("user-id") Long userId) throws JMSException {
+        orderStatusTransactionService.cancelTransaction(id);
+        paymentStatusTransactionService.paymentHasCanceled(id);
+        TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
+        return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/api/v1/transactions/{id}")
+    public ResponseEntity<HttpStatus> deleteTransaction(@PathVariable("id") UUID id, @RequestHeader("user-id") Long userId) throws JMSException {
+        transactionService.deleteTransaction(id, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -33,11 +33,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     public static final String TRANSACTION_HEADER = "payment_id";
 
-    @Autowired
     private final TransactionRepository transactionRepository;
 
-    @Autowired
     private final TransactionMapper transactionMapper;
+
+    private final PaymentStatusTransactionService paymentStatusTransactionService;
 
 
     private ProductRoute productRoute;
@@ -108,6 +108,22 @@ public class TransactionServiceImpl implements TransactionService {
             return transactionDtoForUser;
         }
         return null;
+    }
+
+    @Override
+    public void deleteTransaction(UUID transactionId, Long userId) {
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionId);
+        if (fetchTransaction.isPresent()) {
+            Transaction transaction = fetchTransaction.get();
+            if (transaction.getUserId().equals(userId)) {
+                transaction.setDeletedAt(Timestamp.valueOf(LocalDateTime.now()));
+                transactionRepository.save(transaction);
+                if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
+                    paymentStatusTransactionService.paymentHasCanceled(transaction.getId());
+                }
+            }
+
+        }
     }
 
     private String generateInvoiceNumber(TransactionDto transactionDto) {

@@ -16,4 +16,10 @@ public class AirlinesServiceFeign implements AirlinesService {
         ResponseEntity<AirlinesTransactionDtoForUser> responseEntity = airlinesServiceFeignClient.getTransaction(id);
         return responseEntity.getBody();
     }
+
+    @Override
+    public void cancelTransaction(Long id) {
+        airlinesServiceFeignClient.cancelTransaction(id);
+    }
+
 }

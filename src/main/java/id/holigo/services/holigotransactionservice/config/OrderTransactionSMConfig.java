@@ -3,7 +3,9 @@ package id.holigo.services.holigotransactionservice.config;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
@@ -47,41 +49,31 @@ import lombok.extern.slf4j.Slf4j;
 @EnableStateMachineFactory(name = "orderStatusTransactionSMF")
 public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<OrderStatusEnum, OrderStatusEvent> {
 
-    @Autowired
     private final TransactionRepository transactionRepository;
 
-    @Autowired
     private final PrepaidElectricitiesTransactionService prepaidElectricitiesTransactionService;
 
-    @Autowired
     private final PostpaidPdamTransactionService postpaidPdamTransactionService;
 
-    @Autowired
     private final PrepaidPulsaTransactionService prepaidPulsaTransactionService;
 
-    @Autowired
     private final PostpaidElectricitiesTransactionService postpaidElectricitiesTransactionService;
 
-    @Autowired
     private final PrepaidGameTransactionService prepaidGameTransactionService;
 
-    @Autowired
     private final PrepaidWalletTransactionService prepaidWalletTransactionService;
 
-    @Autowired
     private final PostpaidTvInternetTransactionService postpaidTvInternetTransactionService;
 
-    @Autowired
     private final PostpaidTelephoneTranasctionService postpaidTelephoneTranasctionService;
 
-    @Autowired
     private final PostpaidInsuranceTransactionService postpaidInsuranceTransactionService;
 
-    @Autowired
     private final PostpaidMultifinanceTransactionService postpaidMultifinanceTransactionService;
 
-    @Autowired
     private final PostpaidCreditCardTransactionService postpaidCreditCardTransactionService;
+
+    private final AirlinesService airlinesService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -120,7 +112,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .event(OrderStatusEvent.RETRYING_ISSUED)
                 .and()
                 .withExternal().source(OrderStatusEnum.BOOKED).target(OrderStatusEnum.ORDER_CANCELED)
-                .event(OrderStatusEvent.ORDER_CANCEL)
+                .event(OrderStatusEvent.ORDER_CANCEL).action(orderCanceled())
                 .and()
                 .withExternal().source(OrderStatusEnum.BOOKED).target(OrderStatusEnum.ORDER_EXPIRED)
                 .event(OrderStatusEvent.ORDER_EXPIRE);
@@ -139,6 +131,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
         config.withConfiguration().listener(adapter);
     }
 
+    @Bean
     public Action<OrderStatusEnum, OrderStatusEvent> processIssued() {
         return context -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
@@ -237,6 +230,21 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidCreditCardTransactionService.issuedTransaction(postpaidCreditcardTransactionDto);
+                    break;
+            }
+        };
+    }
+
+    @Bean
+    public Action<OrderStatusEnum, OrderStatusEvent> orderCanceled() {
+        return stateContext -> {
+            Transaction transaction = transactionRepository.getById(UUID.fromString(
+                    stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+            log.info("stateContext -> {}", stateContext.getTarget());
+            switch (transaction.getTransactionType()) {
+                case "AIR":
+                    log.info(" Action<OrderStatusEnum, OrderStatusEvent> cancelTransaction is running -> {}", transaction.getTransactionId());
+                    airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
                     break;
             }
         };

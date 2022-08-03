@@ -10,4 +10,6 @@ public interface PaymentStatusTransactionService {
     StateMachine<PaymentStatusEnum, PaymentStatusEvent> transactionHasBeenPaid(UUID transactionId);
 
     StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasExpired(UUID transactionId);
+
+    StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasCanceled(UUID transactionId);
 }

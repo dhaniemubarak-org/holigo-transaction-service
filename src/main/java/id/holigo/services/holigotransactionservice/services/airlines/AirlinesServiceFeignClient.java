@@ -14,4 +14,7 @@ public interface AirlinesServiceFeignClient {
 
     @RequestMapping(method = RequestMethod.GET, value = AIRLINES_PATH)
     ResponseEntity<AirlinesTransactionDtoForUser> getTransaction(@PathVariable Long id);
+
+    @RequestMapping(method = RequestMethod.PUT, value = AIRLINES_PATH)
+    ResponseEntity<AirlinesTransactionDtoForUser> cancelTransaction(@PathVariable Long id);
 }

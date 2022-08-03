@@ -34,6 +34,8 @@ public class KafkaTopicConfig {
     public static final String UPDATE_AIRLINES_TRANSACTION = "update-airlines-transaction";
     public static final String UPDATE_PAYMENT = "update-payment";
 
+    public static final String CANCEL_PAYMENT = "cancel-payment";
+
     @Bean
     public NewTopic updatePulsaTransaction() {
         return TopicBuilder.name(UPDATE_PULSA_TRANSACTION).build();
@@ -96,6 +98,11 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic updatePayment() {
         return TopicBuilder.name(UPDATE_PAYMENT).build();
+    }
+
+    @Bean
+    public NewTopic cancelPayment() {
+        return TopicBuilder.name(CANCEL_PAYMENT).build();
     }
 
 

@@ -19,4 +19,6 @@ public interface TransactionService {
 
     TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException;
 
+    void deleteTransaction(UUID transactionId, Long userId);
+
 }

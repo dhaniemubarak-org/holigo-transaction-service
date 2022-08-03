@@ -3,9 +3,15 @@ package id.holigo.services.holigotransactionservice.config;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import id.holigo.services.common.model.PaymentDto;
+import id.holigo.services.holigotransactionservice.domain.Transaction;
+import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
+import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionServiceImpl;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
@@ -27,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<PaymentStatusEnum, PaymentStatusEvent> {
 
     private final OrderStatusTransactionService orderStatusTransactionService;
+    private final TransactionRepository transactionRepository;
+
+    private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
 
     @Override
     public void configure(StateMachineStateConfigurer<PaymentStatusEnum, PaymentStatusEvent> states) throws Exception {
@@ -46,7 +55,11 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
                 .and().withExternal().source(PaymentStatusEnum.SELECTING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
                 .event(PaymentStatusEvent.PAYMENT_EXPIRED).action(paymentExpiredAction())
                 .and().withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
-                .event(PaymentStatusEvent.PAYMENT_EXPIRED);
+                .event(PaymentStatusEvent.PAYMENT_EXPIRED).action(paymentExpiredAction())
+                .and().withExternal().source(PaymentStatusEnum.SELECTING_PAYMENT).target(PaymentStatusEnum.PAYMENT_CANCELED)
+                .event(PaymentStatusEvent.PAYMENT_CANCEL).action(paymentCanceledAction())
+                .and().withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAYMENT_CANCELED)
+                .event(PaymentStatusEvent.PAYMENT_CANCEL).action(paymentCanceledAction());
     }
 
     @Override
@@ -62,10 +75,27 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
         config.withConfiguration().listener(adapter);
     }
 
-    private Action<PaymentStatusEnum, PaymentStatusEvent> paymentExpiredAction() {
+    @Bean
+    public Action<PaymentStatusEnum, PaymentStatusEvent> paymentExpiredAction() {
         return stateContext -> {
-            orderStatusTransactionService.expiredTransaction(UUID.fromString(
-                    stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+            Transaction transaction = transactionRepository.getById(UUID.fromString(
+                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+            if (transaction.getPaymentId() != null) {
+                paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
+                        .id(transaction.getPaymentId())
+                        .status(PaymentStatusEnum.PAYMENT_EXPIRED).build());
+            }
+        };
+    }
+
+    @Bean
+    public Action<PaymentStatusEnum, PaymentStatusEvent> paymentCanceledAction() {
+        return stateContext -> {
+            Transaction transaction = transactionRepository.getById(UUID.fromString(
+                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+            if (transaction.getPaymentId() != null) {
+                paymentKafkaTemplate.send(KafkaTopicConfig.CANCEL_PAYMENT, PaymentDto.builder().id(transaction.getPaymentId()).build());
+            }
         };
     }
 }

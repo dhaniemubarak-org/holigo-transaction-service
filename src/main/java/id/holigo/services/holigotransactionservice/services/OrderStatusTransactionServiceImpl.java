@@ -22,7 +22,6 @@ public class OrderStatusTransactionServiceImpl implements OrderStatusTransaction
 
     public static final String TRANSACTION_HEADER = "payment_id";
 
-    @Autowired
     private final TransactionRepository transactionRepository;
 
     private final OrderStatusTransactionInterceptor orderStatusTransactionInterceptor;

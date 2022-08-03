@@ -23,7 +23,6 @@ public class PaymentStatusTransactionServiceImpl implements PaymentStatusTransac
 
     public static final String TRANSACTION_HEADER = "payment_id";
 
-    @Autowired
     private final TransactionRepository transactionRepository;
 
     private final StateMachineFactory<PaymentStatusEnum, PaymentStatusEvent> stateMachineFactory;
@@ -43,6 +42,13 @@ public class PaymentStatusTransactionServiceImpl implements PaymentStatusTransac
     public StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasExpired(UUID transactionId) {
         StateMachine<PaymentStatusEnum, PaymentStatusEvent> sm = build(transactionId);
         sendEvent(transactionId, sm, PaymentStatusEvent.PAYMENT_EXPIRED);
+        return sm;
+    }
+
+    @Override
+    public StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasCanceled(UUID transactionId) {
+        StateMachine<PaymentStatusEnum, PaymentStatusEvent> sm = build(transactionId);
+        sendEvent(transactionId, sm, PaymentStatusEvent.PAYMENT_CANCEL);
         return sm;
     }
 

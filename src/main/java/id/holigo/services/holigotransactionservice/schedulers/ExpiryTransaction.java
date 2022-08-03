@@ -16,6 +16,8 @@ import id.holigo.services.common.model.telephone.PostpaidTelephoneTransactionDto
 import id.holigo.services.holigotransactionservice.config.KafkaTopicConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -34,6 +37,7 @@ import java.util.function.Consumer;
 public class ExpiryTransaction {
     private final TransactionRepository transactionRepository;
     private final PaymentStatusTransactionService paymentStatusTransactionService;
+    private final OrderStatusTransactionService orderStatusTransactionService;
     private final KafkaTemplate<String, PrepaidWalletTransactionDto> ewalletKafkaTemplate;
     private final KafkaTemplate<String, PrepaidPulsaTransactionDto> pulsaKafkaTemplate;
     private final KafkaTemplate<String, PostpaidElectricitiesTransactionDto> postpaidElectricityKafkaTemplate;
@@ -59,6 +63,7 @@ public class ExpiryTransaction {
                         Timestamp.valueOf(LocalDateTime.now()));
         transactions.forEach(transaction -> {
             paymentStatusTransactionService.paymentHasExpired(transaction.getId());
+            orderStatusTransactionService.expiredTransaction(transaction.getId());
             if (transaction.getPaymentServiceId() != null) {
                 paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
                         .status(PaymentStatusEnum.PAYMENT_EXPIRED)
