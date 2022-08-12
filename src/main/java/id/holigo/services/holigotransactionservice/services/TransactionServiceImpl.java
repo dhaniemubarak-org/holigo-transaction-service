@@ -1,32 +1,41 @@
 package id.holigo.services.holigotransactionservice.services;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.jms.JMSException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.component.ProductRoute;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
+import id.holigo.services.holigotransactionservice.repositories.specification.GenericAndSpecification;
+import id.holigo.services.holigotransactionservice.repositories.specification.SearchCriteria;
+import id.holigo.services.holigotransactionservice.repositories.specification.SearchOperation;
+import id.holigo.services.holigotransactionservice.repositories.specification.TransactionSpecification;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
+import id.holigo.services.holigotransactionservice.web.model.TransactionFilterEnum;
 import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.jms.JMSException;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -39,6 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final PaymentStatusTransactionService paymentStatusTransactionService;
 
+    private final TransactionSpecification transactionSpecification;
 
     private ProductRoute productRoute;
 
@@ -50,11 +60,72 @@ public class TransactionServiceImpl implements TransactionService {
     private final OrderStatusTransactionService orderStatusTransactionService;
 
     @Override
-    public TransactionPaginateForUser listTransactionForUser(Long userId, PageRequest pageRequest) {
+    public TransactionPaginateForUser listTransactionForUser(Long userId, TransactionFilterEnum status, String transactionType, Date startDate, Date endDate, PageRequest pageRequest) {
         TransactionPaginateForUser transactionPaginateForUser;
         Page<Transaction> transactionPage;
 
-        transactionPage = transactionRepository.findAllByUserId(userId, pageRequest);
+        List<OrderStatusEnum> orderStatus = new ArrayList<>();
+        List<PaymentStatusEnum> paymentStatus = new ArrayList<>();
+        Specification<Transaction> getByOrder = transactionSpecification.getOrderStatus(orderStatus);
+        Specification<Transaction> getByPayment = transactionSpecification.getPaymentStatus(paymentStatus);
+        Specification<Transaction> getStartDate = transactionSpecification.getByStartDate(startDate);
+        Specification<Transaction> getEndDate = transactionSpecification.getByEndDate(endDate);
+        Specification<Transaction> getDeleted = transactionSpecification.getDeletedAtNull();
+
+        GenericAndSpecification<Transaction> genericAndSpecification = new GenericAndSpecification<>();
+        genericAndSpecification.add(new SearchCriteria("userId", userId, SearchOperation.EQUAL));
+
+        if (transactionType!=null){
+            genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+        }
+
+        if (status!=null){
+            switch (status){
+                case SELECTING_PAYMENT -> {
+                    paymentStatus.add(PaymentStatusEnum.SELECTING_PAYMENT);
+                    orderStatus.add(OrderStatusEnum.PROCESS_BOOK);
+                    orderStatus.add(OrderStatusEnum.BOOKED);
+                }
+                case WAITING_PAYMENT -> {
+                    paymentStatus.add(PaymentStatusEnum.WAITING_PAYMENT);
+                    orderStatus.add(OrderStatusEnum.PROCESS_BOOK);
+                    orderStatus.add(OrderStatusEnum.BOOKED);
+                }
+                case PAID -> {
+                    paymentStatus.add(PaymentStatusEnum.PAID);
+                    orderStatus.add(OrderStatusEnum.BOOKED);
+                }
+                case PROCESS_ISSUED -> {
+                    paymentStatus.add(PaymentStatusEnum.PAID);
+                    orderStatus.add(OrderStatusEnum.PROCESS_ISSUED);
+                    orderStatus.add(OrderStatusEnum.WAITING_ISSUED);
+                    orderStatus.add(OrderStatusEnum.RETRYING_ISSUED);
+                }
+                case ISSUED -> {
+                    paymentStatus.add(PaymentStatusEnum.PAID);
+                    orderStatus.add(OrderStatusEnum.ISSUED);
+                }
+                case ISSUED_FAILED -> {
+                    paymentStatus.add(PaymentStatusEnum.PAID);
+                    paymentStatus.add(PaymentStatusEnum.PROCESS_REFUND);
+                    paymentStatus.add(PaymentStatusEnum.WAITING_REFUND);
+                    paymentStatus.add(PaymentStatusEnum.REFUNDED);
+                    orderStatus.add(OrderStatusEnum.ISSUED_FAILED);
+                }
+                case ORDER_EXPIRED -> {
+                    paymentStatus.add(PaymentStatusEnum.PAYMENT_EXPIRED);
+                    orderStatus.add(OrderStatusEnum.ORDER_EXPIRED);
+                }
+                case ORDER_CANCELED -> {
+                    paymentStatus.add(PaymentStatusEnum.PAYMENT_CANCELED);
+                    orderStatus.add(OrderStatusEnum.ORDER_CANCELED);
+                }
+            }
+
+        }
+
+        transactionPage = transactionRepository.findAll(Specification.where(genericAndSpecification).and(getByOrder.and(getByPayment)).and(getStartDate.and(getEndDate)).and(getDeleted), pageRequest);
+
 
         transactionPaginateForUser = new TransactionPaginateForUser(
                 transactionPage.getContent().stream()

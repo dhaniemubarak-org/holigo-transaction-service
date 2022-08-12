@@ -11,8 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
+public interface TransactionRepository extends JpaRepository<Transaction, UUID>, JpaSpecificationExecutor<Transaction> {
 
     Optional<Transaction> findByIdAndPaymentStatus(UUID id, PaymentStatusEnum paymentStatus);
 

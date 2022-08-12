@@ -1,13 +1,12 @@
 package id.holigo.services.holigotransactionservice.web.controllers;
 
-import java.util.UUID;
-
-import javax.jms.JMSException;
-
-import id.holigo.services.common.model.TransactionDto;
-import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
+import id.holigo.services.holigotransactionservice.services.TransactionService;
+import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
+import id.holigo.services.holigotransactionservice.web.model.TransactionFilterEnum;
+import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -15,11 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import id.holigo.services.holigotransactionservice.services.TransactionService;
-// import id.holigo.services.holigotransactionservice.web.model.DetailProductDtoForUser;
-import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
-import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
-import lombok.RequiredArgsConstructor;
+import javax.jms.JMSException;
+import java.sql.Date;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +25,7 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     private static final Integer DEFAULT_PAGE_NUMBER = 0;
-    private static final Integer DEFAULT_PAGE_SIZE = 25;
+    private static final Integer DEFAULT_PAGE_SIZE = 10;
 
     private final OrderStatusTransactionService orderStatusTransactionService;
 
@@ -38,6 +35,10 @@ public class TransactionController {
     public ResponseEntity<TransactionPaginateForUser> getAllTransactions(
             @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "status", required = false) TransactionFilterEnum status,
+            @RequestParam(value = "transactionType", required = false) String transactionType,
+            @RequestParam(value = "startDate", required = false) Date startDate,
+            @RequestParam(value = "endDate", required = false) Date endDate,
             @RequestHeader(value = "user-id") Long userId) {
 
         if (pageNumber == null || pageNumber < 0) {
@@ -49,7 +50,7 @@ public class TransactionController {
         }
 
         TransactionPaginateForUser transactionList = transactionService
-                .listTransactionForUser(userId, PageRequest.of(pageNumber, pageSize,
+                .listTransactionForUser(userId, status, transactionType, startDate, endDate, PageRequest.of(pageNumber, pageSize,
                         Sort.by("createdAt").descending()));
 
         return new ResponseEntity<>(transactionList, HttpStatus.OK);
