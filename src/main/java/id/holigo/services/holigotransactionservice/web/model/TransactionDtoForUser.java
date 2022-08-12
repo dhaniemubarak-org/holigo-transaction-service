@@ -38,6 +38,8 @@ public class TransactionDtoForUser {
 
     private BigDecimal hpAmount;
 
+    private BigDecimal adminAmount;
+
     private String indexProduct;
 
     private String transactionId;
