@@ -108,6 +108,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.WAITING_ISSUED)
                 .event(OrderStatusEvent.WAITING_ISSUED)
                 .and()
+                .withExternal().source(OrderStatusEnum.WAITING_ISSUED).target(OrderStatusEnum.ISSUED)
+                .event(OrderStatusEvent.ISSUED_SUCCESS)
+                .and()
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.RETRYING_ISSUED)
                 .event(OrderStatusEvent.RETRYING_ISSUED)
                 .and()
@@ -136,101 +139,89 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
         return context -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     context.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
-
-            log.info("Transaction before send JMS -> {}", transaction);
             switch (transaction.getTransactionType()) {
-                case "PRA":
+                case "PRA" -> {
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidElectricitiesTransactionService.issuedTransaction(prepaidElectricitiesTransactionDto);
-                    break;
-                case "PAM":
-                    log.info("Issued PAM is running....");
+                }
+                case "PAM" -> {
                     PostpaidPdamTransactionDto postpaidPdamTransactionDto = PostpaidPdamTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidPdamTransactionService.issuedTransaction(postpaidPdamTransactionDto);
-                    break;
-                case "PUL":
-                case "PD":
-                case "PR":
-                    log.info("Issued Pulsa is running....");
+                }
+                case "PUL", "PD", "PR" -> {
                     PrepaidPulsaTransactionDto prepaidPulsaTransactionDto = PrepaidPulsaTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidPulsaTransactionService.issuedTransaction(prepaidPulsaTransactionDto);
-                    break;
-                case "PAS":
-                    log.info("Issued Pascabayar is running...");
+                }
+                case "PAS" -> {
                     PostpaidElectricitiesTransactionDto postpaidElectricitiesTransactionDto = PostpaidElectricitiesTransactionDto
                             .builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidElectricitiesTransactionService.issuedTransaction(postpaidElectricitiesTransactionDto);
-                    break;
-                case "GAME":
-                    log.info("Issued game is running...");
+                }
+                case "GAME" -> {
                     PrepaidGameTransactionDto prepaidGameTransactionDto = PrepaidGameTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidGameTransactionService.issuedTransaction(prepaidGameTransactionDto);
-                    break;
-                case "EWAL":
-                case "DWAL":
-                    log.info("Issued EWAL / DWAL is running...");
+                }
+                case "EWAL", "DWAL" -> {
                     PrepaidWalletTransactionDto prepaidWalletTransactionDto = PrepaidWalletTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     prepaidWalletTransactionService.issuedTransaction(prepaidWalletTransactionDto);
-                    break;
-                case "NETV":
-                    log.info("Issued NETV / DWAL is running...");
+                }
+                case "NETV" -> {
                     PostpaidTvInternetTransactionDto postpaidTvInternetTransactionDto = PostpaidTvInternetTransactionDto
                             .builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidTvInternetTransactionService.issuedTransaction(postpaidTvInternetTransactionDto);
-                    break;
-                case "TLP":
-                    log.info("Issued TLP is running...");
+                }
+                case "TLP" -> {
                     PostpaidTelephoneTransactionDto postpaidTelephoneTransactionDto = PostpaidTelephoneTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidTelephoneTranasctionService.issuedTransaction(postpaidTelephoneTransactionDto);
-                    break;
-                case "INS":
+                }
+                case "INS" -> {
                     log.info("Issued INS is running...");
                     PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto = PostpaidInsuranceTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidInsuranceTransactionService.issuedTransaction(postpaidInsuranceTransactionDto);
-                    break;
-                case "MFN":
+                }
+                case "MFN" -> {
                     log.info("Issued MFN is running...");
                     PostpaidMultifinanceTransactionDto postpaidMultifinanceTransactionDto = PostpaidMultifinanceTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidMultifinanceTransactionService.issuedTransaction(postpaidMultifinanceTransactionDto);
-                    break;
-                case "CC":
+                }
+                case "CC" -> {
                     log.info("Issued CC is running...");
                     PostpaidCreditcardTransactionDto postpaidCreditcardTransactionDto = PostpaidCreditcardTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidCreditCardTransactionService.issuedTransaction(postpaidCreditcardTransactionDto);
-                    break;
+                }
             }
         };
     }
@@ -242,10 +233,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
             log.info("stateContext -> {}", stateContext.getTarget());
             switch (transaction.getTransactionType()) {
-                case "AIR":
-                    log.info(" Action<OrderStatusEnum, OrderStatusEvent> cancelTransaction is running -> {}", transaction.getTransactionId());
+                case "AIR" -> {
                     airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
-                    break;
+                }
             }
         };
     }
