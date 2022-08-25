@@ -54,6 +54,10 @@ public class TransactionDtoForUser {
 
     private OrderStatusEnum orderStatus;
 
+    private Integer serviceId;
+
+    private Integer productId;
+
     private Object detail;
 
     @Builder.Default

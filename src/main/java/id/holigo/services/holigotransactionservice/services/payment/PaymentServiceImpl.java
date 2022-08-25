@@ -2,7 +2,6 @@ package id.holigo.services.holigotransactionservice.services.payment;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    @Autowired
     private final JmsTemplate jmsTemplate;
 
     private final PaymentServiceFeignClient paymentServiceFeignClient;
