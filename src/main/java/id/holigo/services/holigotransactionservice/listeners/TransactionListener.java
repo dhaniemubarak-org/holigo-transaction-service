@@ -32,9 +32,7 @@ import id.holigo.services.holigotransactionservice.services.TransactionService;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TransactionListener {
@@ -115,9 +113,7 @@ public class TransactionListener {
     @JmsListener(destination = JmsConfig.GET_TRANSACTION_BY_ID)
     public void listenForGetTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
                                         Message message) throws JmsException, JMSException {
-        log.info("listen for get transaction ....");
         TransactionDto transaction = transactionService.getTransactionById(transactionDto.getId());
-        log.info("transaction -> {}", transaction);
         if (transaction != null) {
             transactionDto = transaction;
         }
@@ -127,15 +123,10 @@ public class TransactionListener {
     @Transactional
     @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_BY_TRANSACTION_ID_TYPE)
     public void listenForSetOrderStatusTransaction(TransactionEvent transactionEvent) {
-        log.info("listenForSetOrderStatusTransaction is running ....");
-        log.info("transactionDto -> {}",
-                transactionEvent.getTransactionDto());
-
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
 
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if (fetchTransaction.isPresent()) {
-            log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
             TransactionDto transactionDtoForPayment = transactionMapper
                     .transactionToTransactionDto(transaction);
@@ -148,12 +139,13 @@ public class TransactionListener {
                             .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
                             .fareAmount(transaction.getFareAmount()).build();
                     holiclubService.incrementUserClub(incrementUserClubDto);
-                    if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0) {
+                    if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0 && !transaction.getIsPointSent()) {
                         PointDto pointDto = PointDto.builder().creditAmount(transaction.getHpAmount().intValue())
                                 .transactionId(transaction.getId()).paymentId(transaction.getPaymentId())
                                 .informationIndex("pointStatement.cashBackHoliPoint")
                                 .transactionType(transaction.getTransactionType())
                                 .invoiceNumber(transaction.getInvoiceNumber())
+                                .userId(transaction.getUserId())
                                 .build();
                         try {
                             PointDto resultPointDto = pointService.credit(pointDto);
@@ -168,17 +160,14 @@ public class TransactionListener {
 
                     break;
                 case ISSUED_FAILED:
-                    log.info("Switch to ISSUED_FAILED");
                     orderStatusTransactionService.issuedFail(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case RETRYING_ISSUED:
-                    log.info("Switch to RETRYING_ISSUED");
                     orderStatusTransactionService.retryingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case WAITING_ISSUED:
-                    log.info("Switch to WAITING_ISSUED");
                     orderStatusTransactionService.waitingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
@@ -191,35 +180,25 @@ public class TransactionListener {
                     break;
 
             }
-        } else {
-            log.info("transaction not found");
         }
-
     }
 
     @Transactional
     @JmsListener(destination = JmsConfig.ISSUED_TRANSACTION_BY_ID)
     public void listenForIssuedFromPayment(TransactionEvent transactionEvent) {
-        log.info("Listening for issued from payment...");
-        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
         Optional<Transaction> fetchTransaction = transactionRepository.findByIdAndPaymentStatus(transactionDto.getId(),
                 transactionDto.getPaymentStatus());
         if (fetchTransaction.isPresent()) {
-            log.info("Transaction found");
             Transaction transaction = fetchTransaction.get();
             paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
             orderStatusTransactionService.processIssued(transaction.getId());
-        } else {
-            log.info("Transaction not found");
         }
     }
 
     @Transactional
     @JmsListener(destination = JmsConfig.SET_PAYMENT_IN_TRANSACTION_BY_ID)
     public void listenForSetPayment(TransactionEvent transactionEvent) {
-        log.info("Listening for set payment...");
-        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if (fetchTransaction.isPresent()) {

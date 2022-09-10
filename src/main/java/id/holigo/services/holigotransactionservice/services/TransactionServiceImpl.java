@@ -168,22 +168,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto getTransactionById(UUID id) {
         Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
-        if (fetchTransaction.isPresent()) {
-            TransactionDto transactionDto = transactionMapper
-                    .transactionToTransactionDto(fetchTransaction.get());
-            return transactionDto;
-        }
-        return null;
+        return fetchTransaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
     }
 
     @Override
-    @Transactional
     public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
         Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
         if (fetchTransaction.isPresent()) {
             TransactionDtoForUser transactionDtoForUser = transactionMapper
                     .transactionToTransactionDtoForUser(fetchTransaction.get());
-
             Object detailProduct = productRoute.getDetailProduct(
                     transactionDtoForUser.getTransactionType(),
                     Long.valueOf(transactionDtoForUser.getTransactionId()), LocaleContextHolder.getLocale().toString());
@@ -213,7 +206,7 @@ public class TransactionServiceImpl implements TransactionService {
     private String generateInvoiceNumber(TransactionDto transactionDto) {
 
         return transactionDto.getServiceId().toString() + "/"
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "/" + transactionDto.getTransactionId();
     }
 

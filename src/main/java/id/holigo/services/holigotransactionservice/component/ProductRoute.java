@@ -15,43 +15,30 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductRoute {
-
     private final AirlinesService airlinesService;
 
-    @Autowired
     private final ProductPulsa productPulsa;
 
-    @Autowired
     private final ProductPLNPRE productPln;
 
-    @Autowired
     private final ProductPdam productPdam;
 
-    @Autowired
     private final ProductGame productGame;
 
-    @Autowired
     private final ProductPLNPAS productPLNPAS;
 
-    @Autowired
     private final ProductEwallet productEwallet;
 
-    @Autowired
     private final ProductNetv productNetv;
 
-    @Autowired
     private final ProductInsurance productInsurance;
 
-    @Autowired
     private final ProductMultifinance productMultifinance;
 
-    @Autowired
     private final ProductTelephone productTelephone;
 
-    @Autowired
     private final ProductCreditcard productCreditcard;
 
-    @Autowired
     private final ProductHotel productHotel;
 
     @Transactional
@@ -59,56 +46,19 @@ public class ProductRoute {
         Object fetchData = null;
         log.info("Transaction Type -> {}", transactionType);
         switch (transactionType) {
-            case "PULSA":
-            case "PUL":
-            case "PD":
-            case "PR":
-                fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
-                break;
-
-            case "PRA":
-                fetchData = productPln.sendDetailProduct(id).getDetail();
-                break;
-
-            case "PAM":
-                fetchData = productPdam.sendDetailProduct(id).getDetail();
-                break;
-
-            case "GAME":
-                fetchData = productGame.sendDetailProduct(id).getDetail();
-                break;
-
-            case "PAS":
-                fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
-                break;
-
-            case "EWAL":
-            case "DWAL":
-                fetchData = productEwallet.sendDetailProduct(id).getDetail();
-                break;
-
-            case "NETV":
-                fetchData = productNetv.sendDetailProduct(id).getDetail();
-                break;
-            case "INS":
-                fetchData = productInsurance.sendDetailProduct(id).getDetail();
-                break;
-            case "MFN":
-                fetchData = productMultifinance.sendDetailProduct(id).getDetail();
-                break;
-            case "TLP":
-                fetchData = productTelephone.sendDetailProduct(id).getDetail();
-                break;
-            case "CC":
-                fetchData = productCreditcard.sendDetailProduct(id).getDetail();
-                break;
-
-            case "HTL":
-                fetchData = productHotel.sendDetailProduct(id).getDetail();
-                break;
-            case "AIR":
-                fetchData = airlinesService.getTransaction(id);
-                break;
+            case "PUL", "PD", "PR" -> fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
+            case "PRA" -> fetchData = productPln.sendDetailProduct(id).getDetail();
+            case "PAM" -> fetchData = productPdam.sendDetailProduct(id).getDetail();
+            case "GAME" -> fetchData = productGame.sendDetailProduct(id).getDetail();
+            case "PAS" -> fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
+            case "EWAL", "DWAL" -> fetchData = productEwallet.sendDetailProduct(id).getDetail();
+            case "NETV" -> fetchData = productNetv.sendDetailProduct(id).getDetail();
+            case "INS" -> fetchData = productInsurance.sendDetailProduct(id).getDetail();
+            case "MFN" -> fetchData = productMultifinance.sendDetailProduct(id).getDetail();
+            case "TLP" -> fetchData = productTelephone.sendDetailProduct(id).getDetail();
+            case "CC" -> fetchData = productCreditcard.sendDetailProduct(id).getDetail();
+            case "HTL" -> fetchData = productHotel.sendDetailProduct(id).getDetail();
+            case "AIR" -> fetchData = airlinesService.getTransaction(id);
         }
 
         log.info("Get Fetch Data -> {}", fetchData);
