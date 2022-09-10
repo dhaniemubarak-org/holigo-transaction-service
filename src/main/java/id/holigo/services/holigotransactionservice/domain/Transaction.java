@@ -136,6 +136,7 @@ public class Transaction {
     @Column(columnDefinition = "decimal(10,2) default 0")
     private BigDecimal lossAmount;
 
+    @Column(columnDefinition = "boolean default false")
     @Builder.Default
     private Boolean isPointSent = false;
 
