@@ -1,12 +1,14 @@
 package id.holigo.services.holigotransactionservice.listeners;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import id.holigo.services.common.model.IncrementUserClubDto;
-import id.holigo.services.common.model.UpdateUserPointDto;
+import id.holigo.services.common.model.PointDto;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +39,68 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class TransactionListener {
 
-    @Autowired
-    private final JmsTemplate jmsTemplate;
+    private JmsTemplate jmsTemplate;
 
     @Autowired
-    private final TransactionService transactionService;
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    private TransactionService transactionService;
 
     @Autowired
-    private final TransactionRepository transactionRepository;
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    private TransactionRepository transactionRepository;
 
     @Autowired
-    private final TransactionMapper transactionMapper;
+    public void setTransactionRepository(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
+
+    private TransactionMapper transactionMapper;
 
     @Autowired
-    private final OrderStatusTransactionService orderStatusTransactionService;
+    public void setTransactionMapper(TransactionMapper transactionMapper) {
+        this.transactionMapper = transactionMapper;
+    }
+
+    private OrderStatusTransactionService orderStatusTransactionService;
 
     @Autowired
-    private final PaymentStatusTransactionService paymentStatusTransactionService;
+    public void setOrderStatusTransactionService(OrderStatusTransactionService orderStatusTransactionService) {
+        this.orderStatusTransactionService = orderStatusTransactionService;
+    }
+
+    private PaymentStatusTransactionService paymentStatusTransactionService;
 
     @Autowired
-    private final PaymentService paymentService;
+    public void setPaymentStatusTransactionService(PaymentStatusTransactionService paymentStatusTransactionService) {
+        this.paymentStatusTransactionService = paymentStatusTransactionService;
+    }
+
+    private PaymentService paymentService;
 
     @Autowired
-    private final HoliclubService holiclubService;
+    public void setPaymentService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    private HoliclubService holiclubService;
 
     @Autowired
-    private final PointService pointService;
+    public void setHoliclubService(HoliclubService holiclubService) {
+        this.holiclubService = holiclubService;
+    }
+
+    private PointService pointService;
+
+    @Autowired
+    public void setPointService(PointService pointService) {
+        this.pointService = pointService;
+    }
 
     @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
@@ -104,17 +142,30 @@ public class TransactionListener {
             transactionDtoForPayment.setOrderStatus(transactionDto.getOrderStatus());
             switch (transactionDto.getOrderStatus()) {
                 case ISSUED:
-                    log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     IncrementUserClubDto incrementUserClubDto = IncrementUserClubDto.builder()
                             .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
                             .fareAmount(transaction.getFareAmount()).build();
                     holiclubService.incrementUserClub(incrementUserClubDto);
-                    UpdateUserPointDto updateUserPointDto = UpdateUserPointDto.builder()
-                            .userId(transaction.getUserId()).credit(0).debit(transaction.getHpAmount().intValue())
-                            .invoiceNumber(transaction.getInvoiceNumber()).build();
-                    pointService.updateUserPoint(updateUserPointDto);
+                    if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0) {
+                        PointDto pointDto = PointDto.builder().creditAmount(transaction.getHpAmount().intValue())
+                                .transactionId(transaction.getId()).paymentId(transaction.getPaymentId())
+                                .informationIndex("pointStatement.cashBackHoliPoint")
+                                .transactionType(transaction.getTransactionType())
+                                .invoiceNumber(transaction.getInvoiceNumber())
+                                .build();
+                        try {
+                            PointDto resultPointDto = pointService.credit(pointDto);
+                            if (resultPointDto.getIsValid()) {
+                                transaction.setIsPointSent(resultPointDto.getIsValid());
+                                transactionRepository.save(transaction);
+                            }
+                        } catch (JMSException | JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
                     break;
                 case ISSUED_FAILED:
                     log.info("Switch to ISSUED_FAILED");

@@ -40,10 +40,9 @@ public class Transaction {
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
 
-    @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
+    @Column(length = 36, columnDefinition = "varchar(36)")
     private UUID parentId;
 
-    @Column(nullable = true)
     private String invoiceNumber;
 
     private Long userId;
@@ -55,10 +54,8 @@ public class Transaction {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    @Column(nullable = true)
     private Timestamp deletedAt;
 
-    @Column(nullable = true)
     private Timestamp expiredAt;
 
     @Column(precision = 10, scale = 2, nullable = false)
@@ -88,19 +85,17 @@ public class Transaction {
     private Integer productId;
 
     @Lob
-    @Column(name = "index_product")
     private String indexProduct;
 
-    @Column(length = 36, columnDefinition = "varchar(36)", nullable = true)
+    @Column(length = 36, columnDefinition = "varchar(36)")
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID paymentId;
 
-    @Column(length = 10, columnDefinition = "varchar(10)", nullable = true)
+    @Column(length = 10, columnDefinition = "varchar(10)")
     private String paymentServiceId;
 
     private String voucherCode;
 
-    @Column(name = "index_user")
     private String indexUser;
 
     private String note;
@@ -136,9 +131,12 @@ public class Transaction {
     private BigDecimal hpcAmount;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal prcAmount;    
-    
+    private BigDecimal prcAmount;
+
     @Column(columnDefinition = "decimal(10,2) default 0")
     private BigDecimal lossAmount;
+
+    @Builder.Default
+    private Boolean isPointSent = false;
 
 }
