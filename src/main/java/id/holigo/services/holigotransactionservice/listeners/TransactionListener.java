@@ -1,12 +1,14 @@
 package id.holigo.services.holigotransactionservice.listeners;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import id.holigo.services.common.model.IncrementUserClubDto;
-import id.holigo.services.common.model.UpdateUserPointDto;
+import id.holigo.services.common.model.PointDto;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,39 +32,73 @@ import id.holigo.services.holigotransactionservice.services.TransactionService;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TransactionListener {
 
-    @Autowired
-    private final JmsTemplate jmsTemplate;
+    private JmsTemplate jmsTemplate;
 
     @Autowired
-    private final TransactionService transactionService;
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    private TransactionService transactionService;
 
     @Autowired
-    private final TransactionRepository transactionRepository;
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    private TransactionRepository transactionRepository;
 
     @Autowired
-    private final TransactionMapper transactionMapper;
+    public void setTransactionRepository(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
+
+    private TransactionMapper transactionMapper;
 
     @Autowired
-    private final OrderStatusTransactionService orderStatusTransactionService;
+    public void setTransactionMapper(TransactionMapper transactionMapper) {
+        this.transactionMapper = transactionMapper;
+    }
+
+    private OrderStatusTransactionService orderStatusTransactionService;
 
     @Autowired
-    private final PaymentStatusTransactionService paymentStatusTransactionService;
+    public void setOrderStatusTransactionService(OrderStatusTransactionService orderStatusTransactionService) {
+        this.orderStatusTransactionService = orderStatusTransactionService;
+    }
+
+    private PaymentStatusTransactionService paymentStatusTransactionService;
 
     @Autowired
-    private final PaymentService paymentService;
+    public void setPaymentStatusTransactionService(PaymentStatusTransactionService paymentStatusTransactionService) {
+        this.paymentStatusTransactionService = paymentStatusTransactionService;
+    }
+
+    private PaymentService paymentService;
 
     @Autowired
-    private final HoliclubService holiclubService;
+    public void setPaymentService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    private HoliclubService holiclubService;
 
     @Autowired
-    private final PointService pointService;
+    public void setHoliclubService(HoliclubService holiclubService) {
+        this.holiclubService = holiclubService;
+    }
+
+    private PointService pointService;
+
+    @Autowired
+    public void setPointService(PointService pointService) {
+        this.pointService = pointService;
+    }
 
     @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
@@ -77,9 +113,7 @@ public class TransactionListener {
     @JmsListener(destination = JmsConfig.GET_TRANSACTION_BY_ID)
     public void listenForGetTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
                                         Message message) throws JmsException, JMSException {
-        log.info("listen for get transaction ....");
         TransactionDto transaction = transactionService.getTransactionById(transactionDto.getId());
-        log.info("transaction -> {}", transaction);
         if (transaction != null) {
             transactionDto = transaction;
         }
@@ -89,45 +123,51 @@ public class TransactionListener {
     @Transactional
     @JmsListener(destination = JmsConfig.SET_ORDER_STATUS_BY_TRANSACTION_ID_TYPE)
     public void listenForSetOrderStatusTransaction(TransactionEvent transactionEvent) {
-        log.info("listenForSetOrderStatusTransaction is running ....");
-        log.info("transactionDto -> {}",
-                transactionEvent.getTransactionDto());
-
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
 
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if (fetchTransaction.isPresent()) {
-            log.info("transaction found");
             Transaction transaction = fetchTransaction.get();
             TransactionDto transactionDtoForPayment = transactionMapper
                     .transactionToTransactionDto(transaction);
             transactionDtoForPayment.setOrderStatus(transactionDto.getOrderStatus());
             switch (transactionDto.getOrderStatus()) {
                 case ISSUED:
-                    log.info("Switch to ISSUED");
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     IncrementUserClubDto incrementUserClubDto = IncrementUserClubDto.builder()
                             .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
                             .fareAmount(transaction.getFareAmount()).build();
                     holiclubService.incrementUserClub(incrementUserClubDto);
-                    UpdateUserPointDto updateUserPointDto = UpdateUserPointDto.builder()
-                            .userId(transaction.getUserId()).credit(0).debit(transaction.getHpAmount().intValue())
-                            .invoiceNumber(transaction.getInvoiceNumber()).build();
-                    pointService.updateUserPoint(updateUserPointDto);
+                    if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0 && !transaction.getIsPointSent()) {
+                        PointDto pointDto = PointDto.builder().creditAmount(transaction.getHpAmount().intValue())
+                                .transactionId(transaction.getId()).paymentId(transaction.getPaymentId())
+                                .informationIndex("pointStatement.cashBackHoliPoint")
+                                .transactionType(transaction.getTransactionType())
+                                .invoiceNumber(transaction.getInvoiceNumber())
+                                .userId(transaction.getUserId())
+                                .build();
+                        try {
+                            PointDto resultPointDto = pointService.credit(pointDto);
+                            if (resultPointDto.getIsValid()) {
+                                transaction.setIsPointSent(resultPointDto.getIsValid());
+                                transactionRepository.save(transaction);
+                            }
+                        } catch (JMSException | JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
                     break;
                 case ISSUED_FAILED:
-                    log.info("Switch to ISSUED_FAILED");
                     orderStatusTransactionService.issuedFail(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case RETRYING_ISSUED:
-                    log.info("Switch to RETRYING_ISSUED");
                     orderStatusTransactionService.retryingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
                 case WAITING_ISSUED:
-                    log.info("Switch to WAITING_ISSUED");
                     orderStatusTransactionService.waitingIssued(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
                     break;
@@ -140,35 +180,25 @@ public class TransactionListener {
                     break;
 
             }
-        } else {
-            log.info("transaction not found");
         }
-
     }
 
     @Transactional
     @JmsListener(destination = JmsConfig.ISSUED_TRANSACTION_BY_ID)
     public void listenForIssuedFromPayment(TransactionEvent transactionEvent) {
-        log.info("Listening for issued from payment...");
-        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
         Optional<Transaction> fetchTransaction = transactionRepository.findByIdAndPaymentStatus(transactionDto.getId(),
                 transactionDto.getPaymentStatus());
         if (fetchTransaction.isPresent()) {
-            log.info("Transaction found");
             Transaction transaction = fetchTransaction.get();
             paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
             orderStatusTransactionService.processIssued(transaction.getId());
-        } else {
-            log.info("Transaction not found");
         }
     }
 
     @Transactional
     @JmsListener(destination = JmsConfig.SET_PAYMENT_IN_TRANSACTION_BY_ID)
     public void listenForSetPayment(TransactionEvent transactionEvent) {
-        log.info("Listening for set payment...");
-        log.info("transactionDto -> {}", transactionEvent.getTransactionDto());
         TransactionDto transactionDto = transactionEvent.getTransactionDto();
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if (fetchTransaction.isPresent()) {

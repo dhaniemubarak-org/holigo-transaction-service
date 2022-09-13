@@ -11,9 +11,7 @@ import id.holigo.services.holigotransactionservice.repositories.specification.Se
 import id.holigo.services.holigotransactionservice.repositories.specification.SearchOperation;
 import id.holigo.services.holigotransactionservice.repositories.specification.TransactionSpecification;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
-import id.holigo.services.holigotransactionservice.web.model.TransactionDtoForUser;
-import id.holigo.services.holigotransactionservice.web.model.TransactionFilterEnum;
-import id.holigo.services.holigotransactionservice.web.model.TransactionPaginateForUser;
+import id.holigo.services.holigotransactionservice.web.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,17 +61,35 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<OrderStatusEnum> orderStatus = new ArrayList<>();
         List<PaymentStatusEnum> paymentStatus = new ArrayList<>();
+        List<String> serviceCodes = new ArrayList<>();
         Specification<Transaction> getByOrder = transactionSpecification.getOrderStatus(orderStatus);
         Specification<Transaction> getByPayment = transactionSpecification.getPaymentStatus(paymentStatus);
         Specification<Transaction> getStartDate = transactionSpecification.getByStartDate(startDate);
         Specification<Transaction> getEndDate = transactionSpecification.getByEndDate(endDate);
         Specification<Transaction> getDeleted = transactionSpecification.getDeletedAtNull();
+        Specification<Transaction> getTransactionType = transactionSpecification.getTransactionType(serviceCodes);
 
         GenericAndSpecification<Transaction> genericAndSpecification = new GenericAndSpecification<>();
         genericAndSpecification.add(new SearchCriteria("userId", userId, SearchOperation.EQUAL));
 
         if (transactionType!=null){
-            genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+            switch (transactionType){
+                case "AIR", "HTL" -> genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+                case "PRE" -> {
+                    PrepaidEnum[] prepaidEnums = PrepaidEnum.values();
+                    for (PrepaidEnum prepaidEnum: prepaidEnums
+                         ) {
+                        serviceCodes.add(prepaidEnum.name());
+                    }
+                }
+                case "POST" -> {
+                    PostpaidEnum[] postpaidEnums = PostpaidEnum.values();
+                    for (PostpaidEnum postpaidEnum: postpaidEnums
+                         ) {
+                        serviceCodes.add(postpaidEnum.name());
+                    }
+                }
+            }
         }
 
         if (status!=null){
@@ -124,7 +137,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         }
 
-        transactionPage = transactionRepository.findAll(Specification.where(genericAndSpecification).and(getByOrder.and(getByPayment)).and(getStartDate.and(getEndDate)).and(getDeleted), pageRequest);
+        transactionPage = transactionRepository.findAll(Specification.where(genericAndSpecification).and(getByOrder.and(getByPayment)).and(getStartDate.and(getEndDate)).and(getDeleted).and(getTransactionType), pageRequest);
 
 
         transactionPaginateForUser = new TransactionPaginateForUser(
@@ -155,22 +168,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto getTransactionById(UUID id) {
         Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
-        if (fetchTransaction.isPresent()) {
-            TransactionDto transactionDto = transactionMapper
-                    .transactionToTransactionDto(fetchTransaction.get());
-            return transactionDto;
-        }
-        return null;
+        return fetchTransaction.map(transactionMapper::transactionToTransactionDto).orElse(null);
     }
 
     @Override
-    @Transactional
     public TransactionDtoForUser getTransactionByIdForUser(UUID id) throws JMSException {
         Optional<Transaction> fetchTransaction = transactionRepository.findById(id);
         if (fetchTransaction.isPresent()) {
             TransactionDtoForUser transactionDtoForUser = transactionMapper
                     .transactionToTransactionDtoForUser(fetchTransaction.get());
-
             Object detailProduct = productRoute.getDetailProduct(
                     transactionDtoForUser.getTransactionType(),
                     Long.valueOf(transactionDtoForUser.getTransactionId()), LocaleContextHolder.getLocale().toString());
@@ -200,7 +206,7 @@ public class TransactionServiceImpl implements TransactionService {
     private String generateInvoiceNumber(TransactionDto transactionDto) {
 
         return transactionDto.getServiceId().toString() + "/"
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")).toString()
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "/" + transactionDto.getTransactionId();
     }
 

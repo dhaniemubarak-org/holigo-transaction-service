@@ -36,12 +36,10 @@ public class JmsConfig {
     public static final String DETAIL_PRODUCT_TLP_TRANSACTION = "detail-product-tlp-transaction";
     public static final String ISSUED_POSTPAID_CC_BY_ID = "issued-postpaid-cc-by-id";
     public static final String DETAIL_PRODUCT_CC_TRANSACTION = "detail-product-cc-transaction";
-
     public static final String INCREMENT_USERCLUB_BY_USER_ID_QUEUE = "increment-userclub-by-user-id";
-
-    public static final String UPDATE_POINT_BY_USER_ID_QUEUE = "update-point-by-user-id-queue";
-
     public static final String DETAIL_PRODUCT_HOTEL_TRANSACTION = "detail-product-hotel-transaction";
+    public static final String DEBIT_POINT = "debit-point";
+    public static final String CREDIT_POINT = "credit-point";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

@@ -56,6 +56,10 @@ public class GenericOrSpecification<T> implements Specification<T> {
             }
         }
 
+        if (list.isEmpty()){
+            return builder.and();
+        }
+
         return builder.or(predicates.toArray(new Predicate[0]));
     }
     
