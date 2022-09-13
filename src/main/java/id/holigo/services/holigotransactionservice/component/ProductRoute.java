@@ -4,7 +4,6 @@ import javax.jms.JMSException;
 
 import id.holigo.services.holigotransactionservice.sender.*;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class ProductRoute {
     private final AirlinesService airlinesService;
 
@@ -44,7 +42,6 @@ public class ProductRoute {
     @Transactional
     public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
         Object fetchData = null;
-        log.info("Transaction Type -> {}", transactionType);
         switch (transactionType) {
             case "PUL", "PD", "PR" -> fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
             case "PRA" -> fetchData = productPln.sendDetailProduct(id).getDetail();
@@ -60,8 +57,6 @@ public class ProductRoute {
             case "HTL" -> fetchData = productHotel.sendDetailProduct(id).getDetail();
             case "AIR" -> fetchData = airlinesService.getTransaction(id);
         }
-
-        log.info("Get Fetch Data -> {}", fetchData);
         return fetchData;
     }
 }
