@@ -21,6 +21,7 @@ public class ProductPulsa {
 
     @Transactional
     public DetailProductTransaction sendDetailProduct(Long productId, String locale) throws JMSException {
+
         DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(productId).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_TRANSACTION_PULSA, session -> {
             Message message1;
