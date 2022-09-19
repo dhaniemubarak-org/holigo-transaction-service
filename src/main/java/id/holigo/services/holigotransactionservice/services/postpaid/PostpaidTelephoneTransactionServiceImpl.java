@@ -22,7 +22,7 @@ public class PostpaidTelephoneTransactionServiceImpl implements PostpaidTelephon
 
     @Override
     public void issuedTransaction(PostpaidTelephoneTransactionDto postpaidTelephoneTransactionDto) {
-        log.info("issuedTransaction postpaidTelephoneTransactionDto isrunning dto -> {}",
+        log.info("issuedTransaction postpaidTelephoneTransactionDto is running dto -> {}",
                 postpaidTelephoneTransactionDto);
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_POSTPAID_TLP_BY_ID,
                 new IssuedPostpaidTelephoneEvent(postpaidTelephoneTransactionDto));

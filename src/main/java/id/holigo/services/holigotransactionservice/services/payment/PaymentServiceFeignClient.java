@@ -14,7 +14,7 @@ import id.holigo.services.common.model.PaymentDtoForUser;
 @FeignClient(name = "holigo-payment-service")
 public interface PaymentServiceFeignClient {
 
-    public static final String PAYMENT_DETAIL_BY_ID = "/api/v1/payments/{id}";
+    String PAYMENT_DETAIL_BY_ID = "/api/v1/payments/{id}";
 
     @RequestMapping(method = RequestMethod.GET, value = PAYMENT_DETAIL_BY_ID)
     ResponseEntity<PaymentDtoForUser> getPayment(@PathVariable UUID id);

@@ -7,8 +7,10 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.IncrementUserClubDto;
 import id.holigo.services.common.model.PointDto;
+import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class TransactionListener {
+
+    private DepositService depositService;
+
+    @Autowired
+    public void setDepositService(DepositService depositService) {
+        this.depositService = depositService;
+    }
 
     private JmsTemplate jmsTemplate;
 
@@ -208,6 +217,16 @@ public class TransactionListener {
             transaction.setPointAmount(transactionDto.getPointAmount());
             transaction.setPaymentServiceId(transactionDto.getPaymentServiceId());
             transaction.setVoucherCode(transactionDto.getVoucherCode());
+            if (transaction.getTransactionType().equals("HTD")) {
+                depositService.issuedDeposit(DepositTransactionDto.builder()
+                        .id(Long.valueOf(transaction.getTransactionId()))
+                        .paymentStatus(transaction.getPaymentStatus())
+                        .orderStatus(transaction.getOrderStatus())
+                        .paymentServiceId(transaction.getPaymentServiceId())
+                        .fareAmount(transaction.getFareAmount())
+                        .paymentId(transaction.getPaymentId())
+                        .build());
+            }
             transactionRepository.save(transaction);
         }
     }

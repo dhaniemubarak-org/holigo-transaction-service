@@ -3,8 +3,9 @@ package id.holigo.services.holigotransactionservice.config;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
-import org.springframework.beans.factory.annotation.Autowired;
+import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -74,6 +75,8 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     private final PostpaidCreditCardTransactionService postpaidCreditCardTransactionService;
 
     private final AirlinesService airlinesService;
+
+    private final DepositService depositService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -199,7 +202,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     postpaidTelephoneTranasctionService.issuedTransaction(postpaidTelephoneTransactionDto);
                 }
                 case "INS" -> {
-                    log.info("Issued INS is running...");
                     PostpaidInsuranceTransactionDto postpaidInsuranceTransactionDto = PostpaidInsuranceTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
@@ -207,7 +209,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     postpaidInsuranceTransactionService.issuedTransaction(postpaidInsuranceTransactionDto);
                 }
                 case "MFN" -> {
-                    log.info("Issued MFN is running...");
                     PostpaidMultifinanceTransactionDto postpaidMultifinanceTransactionDto = PostpaidMultifinanceTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
@@ -215,13 +216,20 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     postpaidMultifinanceTransactionService.issuedTransaction(postpaidMultifinanceTransactionDto);
                 }
                 case "CC" -> {
-                    log.info("Issued CC is running...");
                     PostpaidCreditcardTransactionDto postpaidCreditcardTransactionDto = PostpaidCreditcardTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidCreditCardTransactionService.issuedTransaction(postpaidCreditcardTransactionDto);
                 }
+                case "HTD" -> depositService.issuedDeposit(DepositTransactionDto.builder()
+                        .id(Long.valueOf(transaction.getTransactionId()))
+                        .paymentStatus(transaction.getPaymentStatus())
+                        .orderStatus(transaction.getOrderStatus())
+                        .paymentServiceId(transaction.getPaymentServiceId())
+                        .fareAmount(transaction.getFareAmount())
+                        .paymentId(transaction.getPaymentId())
+                        .build());
             }
         };
     }

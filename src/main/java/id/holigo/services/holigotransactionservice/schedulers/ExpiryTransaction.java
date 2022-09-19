@@ -17,19 +17,15 @@ import id.holigo.services.holigotransactionservice.config.KafkaTopicConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
-import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +50,7 @@ public class ExpiryTransaction {
     private final KafkaTemplate<String, AirlinesTransactionDtoForUser> airlinesKafkaTemplate;
     private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
 
-    @Scheduled(fixedRate = 10000)
+//    @Scheduled(fixedRate = 10000)
     public void toExpiryOrder() {
 
         List<Transaction> transactions = transactionRepository

@@ -1,6 +1,7 @@
 package id.holigo.services.holigotransactionservice.config;
 
 import id.holigo.services.common.model.AirlinesTransactionDtoForUser;
+import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.PaymentDto;
 import id.holigo.services.common.model.creditcard.PostpaidCreditcardTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
@@ -39,6 +40,11 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return props;
+    }
+
+    @Bean
+    public ProducerFactory<String, DepositTransactionDto> depositTransactionProducer() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
@@ -179,6 +185,11 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, PaymentDto> paymentKafkaTemplate(ProducerFactory<String, PaymentDto> paymentProducer) {
         return new KafkaTemplate<>(paymentProducer);
+    }
+
+    @Bean
+    public KafkaTemplate<String, DepositTransactionDto> depositTransactionKafkaTemplate(ProducerFactory<String, DepositTransactionDto> depositTransactionProducer) {
+        return new KafkaTemplate<>(depositTransactionProducer);
     }
 
 }
