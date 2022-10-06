@@ -130,7 +130,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .event(OrderStatusEvent.ORDER_CANCEL).action(orderCanceled())
                 .and()
                 .withExternal().source(OrderStatusEnum.BOOKED).target(OrderStatusEnum.ORDER_EXPIRED)
-                .event(OrderStatusEvent.ORDER_EXPIRE);
+                .event(OrderStatusEvent.ORDER_EXPIRE).action(orderCanceled());
     }
 
     @Override
@@ -150,7 +150,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     public Action<OrderStatusEnum, OrderStatusEvent> processIssued() {
         return context -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
-                    context.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+                    context.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
             switch (transaction.getTransactionType()) {
                 case "PRA" -> {
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto
@@ -247,8 +247,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     public Action<OrderStatusEnum, OrderStatusEvent> orderCanceled() {
         return stateContext -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
-                    stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
-            log.info("stateContext -> {}", stateContext.getTarget());
+                    stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
             switch (transaction.getTransactionType()) {
                 case "AIR" -> {
                     airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));

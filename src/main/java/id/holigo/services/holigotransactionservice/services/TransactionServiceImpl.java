@@ -20,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import java.sql.Date;
@@ -34,8 +33,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class TransactionServiceImpl implements TransactionService {
-
-    public static final String TRANSACTION_HEADER = "payment_id";
 
     private final TransactionRepository transactionRepository;
 

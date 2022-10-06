@@ -21,6 +21,7 @@ import id.holigo.services.holigotransactionservice.services.PaymentStatusTransac
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -50,17 +51,19 @@ public class ExpiryTransaction {
     private final KafkaTemplate<String, AirlinesTransactionDtoForUser> airlinesKafkaTemplate;
     private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
 
-//    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 10000)
     public void toExpiryOrder() {
-
+        log.info("toExpiryOrder is running....");
         List<Transaction> transactions = transactionRepository
                 .findAllByPaymentStatusInAndExpiredAtLessThanEqual(
                         List.of(PaymentStatusEnum.SELECTING_PAYMENT, PaymentStatusEnum.WAITING_PAYMENT),
                         Timestamp.valueOf(LocalDateTime.now()));
         transactions.forEach(transaction -> {
+            log.info("Set payment expired with id -> {}", transaction.getId());
             paymentStatusTransactionService.paymentHasExpired(transaction.getId());
             orderStatusTransactionService.expiredTransaction(transaction.getId());
-            if (transaction.getPaymentServiceId() != null) {
+            if (transaction.getPaymentId() != null) {
+                log.info("Kafka is running");
                 paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
                         .status(PaymentStatusEnum.PAYMENT_EXPIRED)
                         .transactionId(transaction.getId()).build());

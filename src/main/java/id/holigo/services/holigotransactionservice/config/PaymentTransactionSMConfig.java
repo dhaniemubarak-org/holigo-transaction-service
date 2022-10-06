@@ -6,8 +6,6 @@ import java.util.UUID;
 import id.holigo.services.common.model.PaymentDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
-import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
-import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @EnableStateMachineFactory(name = "paymentStatusTransactionSMF")
 @Configuration
 public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<PaymentStatusEnum, PaymentStatusEvent> {
-
-    private final OrderStatusTransactionService orderStatusTransactionService;
     private final TransactionRepository transactionRepository;
 
     private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
@@ -79,7 +75,7 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
     public Action<PaymentStatusEnum, PaymentStatusEvent> paymentExpiredAction() {
         return stateContext -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
-                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.PAYMENT_STATUS_HEADER).toString()));
             if (transaction.getPaymentId() != null) {
                 paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
                         .id(transaction.getPaymentId())
@@ -92,7 +88,7 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
     public Action<PaymentStatusEnum, PaymentStatusEvent> paymentCanceledAction() {
         return stateContext -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
-                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.TRANSACTION_HEADER).toString()));
+                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.PAYMENT_STATUS_HEADER).toString()));
             if (transaction.getPaymentId() != null) {
                 paymentKafkaTemplate.send(KafkaTopicConfig.CANCEL_PAYMENT, PaymentDto.builder().id(transaction.getPaymentId()).build());
             }

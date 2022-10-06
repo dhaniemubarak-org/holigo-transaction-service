@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,18 +26,15 @@ public class OrderStatusTransactionInterceptor
 
     @Override
     public void preStateChange(State<OrderStatusEnum, OrderStatusEvent> state, Message<OrderStatusEvent> message,
-            Transition<OrderStatusEnum, OrderStatusEvent> transition,
-            StateMachine<OrderStatusEnum, OrderStatusEvent> stateMachine) {
-        Optional.ofNullable(message).ifPresent(msg -> {
-            Optional.ofNullable(
-                    UUID.class.cast(UUID
-                            .fromString(msg.getHeaders().get(TransactionServiceImpl.TRANSACTION_HEADER).toString())))
-                    .ifPresent(id -> {
-                        Transaction transaction = transactionRepository.getById(id);
-                        transaction.setOrderStatus(state.getId());
-                        transactionRepository.save(transaction);
-                    });
-        });
+                               Transition<OrderStatusEnum, OrderStatusEvent> transition,
+                               StateMachine<OrderStatusEnum, OrderStatusEvent> stateMachine) {
+        Optional.ofNullable(message).flatMap(msg -> Optional.of(UUID.fromString(
+                        Objects.requireNonNull(msg.getHeaders().get(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER)).toString())))
+                .ifPresent(id -> {
+                    Transaction transaction = transactionRepository.getById(id);
+                    transaction.setOrderStatus(state.getId());
+                    transactionRepository.save(transaction);
+                });
     }
 
 }

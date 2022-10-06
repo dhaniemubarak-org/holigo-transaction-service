@@ -2,7 +2,7 @@ package id.holigo.services.holigotransactionservice.services;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -15,12 +15,14 @@ import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderStatusTransactionServiceImpl implements OrderStatusTransactionService {
 
-    public static final String TRANSACTION_HEADER = "payment_id";
+    public static final String ORDER_STATUS_HEADER = "transaction_id_order";
 
     private final TransactionRepository transactionRepository;
 
@@ -85,16 +87,18 @@ public class OrderStatusTransactionServiceImpl implements OrderStatusTransaction
     }
 
     @Override
+    @Transactional
     public StateMachine<OrderStatusEnum, OrderStatusEvent> expiredTransaction(UUID transactionId) {
+        log.info("expiredTransaction is running....");
         StateMachine<OrderStatusEnum, OrderStatusEvent> sm = build(transactionId);
         sendEvent(transactionId, sm, OrderStatusEvent.ORDER_EXPIRE);
         return sm;
     }
 
     private void sendEvent(UUID id, StateMachine<OrderStatusEnum, OrderStatusEvent> sm,
-            OrderStatusEvent event) {
+                           OrderStatusEvent event) {
         Message<OrderStatusEvent> message = MessageBuilder.withPayload(event)
-                .setHeader(TRANSACTION_HEADER, id).build();
+                .setHeader(ORDER_STATUS_HEADER, id).build();
         sm.sendEvent(message);
     }
 
@@ -107,7 +111,7 @@ public class OrderStatusTransactionServiceImpl implements OrderStatusTransaction
         sm.stop();
         sm.getStateMachineAccessor().doWithAllRegions(sma -> {
             sma.addStateMachineInterceptor(orderStatusTransactionInterceptor);
-            sma.resetStateMachine(new DefaultStateMachineContext<OrderStatusEnum, OrderStatusEvent>(
+            sma.resetStateMachine(new DefaultStateMachineContext<>(
                     transaction.getOrderStatus(), null, null, null));
         });
         sm.start();

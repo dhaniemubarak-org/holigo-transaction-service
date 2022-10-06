@@ -1,5 +1,6 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,17 +25,14 @@ public class PaymentStatusTransactionInterceptor extends StateMachineInterceptor
 
     @Override
     public void preStateChange(State<PaymentStatusEnum, PaymentStatusEvent> state, Message<PaymentStatusEvent> message,
-            Transition<PaymentStatusEnum, PaymentStatusEvent> transition,
-            StateMachine<PaymentStatusEnum, PaymentStatusEvent> stateMachine) {
-        Optional.ofNullable(message).ifPresent(msg -> {
-            Optional.ofNullable(
-                    UUID.class.cast(UUID
-                            .fromString(msg.getHeaders().get(TransactionServiceImpl.TRANSACTION_HEADER).toString())))
-                    .ifPresent(id -> {
-                        Transaction transaction = transactionRepository.getById(id);
-                        transaction.setPaymentStatus(state.getId());
-                        transactionRepository.save(transaction);
-                    });
-        });
+                               Transition<PaymentStatusEnum, PaymentStatusEvent> transition,
+                               StateMachine<PaymentStatusEnum, PaymentStatusEvent> stateMachine) {
+        Optional.ofNullable(message).flatMap(msg -> Optional.of(UUID.fromString(
+                        Objects.requireNonNull(msg.getHeaders().get(PaymentStatusTransactionServiceImpl.PAYMENT_STATUS_HEADER)).toString())))
+                .ifPresent(id -> {
+                    Transaction transaction = transactionRepository.getById(id);
+                    transaction.setPaymentStatus(state.getId());
+                    transactionRepository.save(transaction);
+                });
     }
 }
