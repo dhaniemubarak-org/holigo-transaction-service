@@ -79,6 +79,7 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
             if (transaction.getPaymentId() != null) {
                 paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
                         .id(transaction.getPaymentId())
+                        .transactionId(transaction.getId())
                         .status(PaymentStatusEnum.PAYMENT_EXPIRED).build());
             }
         };
@@ -90,7 +91,10 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.PAYMENT_STATUS_HEADER).toString()));
             if (transaction.getPaymentId() != null) {
-                paymentKafkaTemplate.send(KafkaTopicConfig.CANCEL_PAYMENT, PaymentDto.builder().id(transaction.getPaymentId()).build());
+                paymentKafkaTemplate.send(KafkaTopicConfig.CANCEL_PAYMENT, PaymentDto.builder()
+                        .id(transaction.getPaymentId())
+                        .transactionId(transaction.getId())
+                        .status(PaymentStatusEnum.PAYMENT_CANCELED).build());
             }
         };
     }

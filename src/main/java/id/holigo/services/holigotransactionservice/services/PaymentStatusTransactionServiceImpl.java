@@ -43,6 +43,7 @@ public class PaymentStatusTransactionServiceImpl implements PaymentStatusTransac
         return sm;
     }
 
+    @Transactional
     @Override
     public StateMachine<PaymentStatusEnum, PaymentStatusEvent> paymentHasCanceled(UUID transactionId) {
         StateMachine<PaymentStatusEnum, PaymentStatusEvent> sm = build(transactionId);

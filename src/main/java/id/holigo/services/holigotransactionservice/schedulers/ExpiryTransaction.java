@@ -58,11 +58,11 @@ public class ExpiryTransaction {
         transactions.forEach(transaction -> {
             paymentStatusTransactionService.paymentHasExpired(transaction.getId());
             orderStatusTransactionService.expiredTransaction(transaction.getId());
-            if (transaction.getPaymentId() != null) {
-                paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
-                        .status(PaymentStatusEnum.PAYMENT_EXPIRED)
-                        .transactionId(transaction.getId()).build());
-            }
+//            if (transaction.getPaymentId() != null) {
+//                paymentKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT, PaymentDto.builder()
+//                        .status(PaymentStatusEnum.PAYMENT_EXPIRED)
+//                        .transactionId(transaction.getId()).build());
+//            }
             switch (transaction.getTransactionType()) {
                 case "PUL", "PR", "PD":
                     pulsaKafkaTemplate.send(KafkaTopicConfig.UPDATE_PULSA_TRANSACTION, PrepaidPulsaTransactionDto.builder()
