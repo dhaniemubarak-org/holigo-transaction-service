@@ -42,7 +42,7 @@ public class TransactionListenerTest {
                 .createdAt(Timestamp.valueOf(LocalDateTime.now())).updatedAt(Timestamp.valueOf(LocalDateTime.now()))
                 .discountAmount(new BigDecimal(0.00)).expiredAt(Timestamp.valueOf(LocalDateTime.now()))
                 .fareAmount(new BigDecimal(98500.00)).nraAmount(new BigDecimal(500.00)).ntaAmount(new BigDecimal(98000))
-                .productId(10).serviceId(13).transactionId("77763746").transactionType("PRA").build();
+                .productId(10).serviceId(13).transactionId("77763746").transactionType("PLNPRE").build();
     }
 
     @Transactional

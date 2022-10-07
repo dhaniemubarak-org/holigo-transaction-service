@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -44,10 +43,10 @@ public class ProductRoute {
         Object fetchData = null;
         switch (transactionType) {
             case "PUL", "PD", "PR" -> fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
-            case "PRA" -> fetchData = productPln.sendDetailProduct(id).getDetail();
+            case "PRA", "PLNPRE" -> fetchData = productPln.sendDetailProduct(id).getDetail();
             case "PAM" -> fetchData = productPdam.sendDetailProduct(id).getDetail();
             case "GAME" -> fetchData = productGame.sendDetailProduct(id).getDetail();
-            case "PAS" -> fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
+            case "PAS", "PLNPOST" -> fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
             case "EWAL", "DWAL" -> fetchData = productEwallet.sendDetailProduct(id).getDetail();
             case "NETV" -> fetchData = productNetv.sendDetailProduct(id).getDetail();
             case "INS" -> fetchData = productInsurance.sendDetailProduct(id).getDetail();

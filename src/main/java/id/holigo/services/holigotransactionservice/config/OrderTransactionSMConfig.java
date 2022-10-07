@@ -152,7 +152,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     context.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
             switch (transaction.getTransactionType()) {
-                case "PRA" -> {
+                case "PRA", "PLNPRE" -> {
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto
                             .builder().id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
@@ -173,7 +173,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .transactionId(transaction.getId()).build();
                     prepaidPulsaTransactionService.issuedTransaction(prepaidPulsaTransactionDto);
                 }
-                case "PAS" -> {
+                case "PAS", "PLNPOST" -> {
                     PostpaidElectricitiesTransactionDto postpaidElectricitiesTransactionDto = PostpaidElectricitiesTransactionDto
                             .builder()
                             .id(Long.valueOf(transaction.getTransactionId()))

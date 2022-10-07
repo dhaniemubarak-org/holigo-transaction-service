@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+
 @RequiredArgsConstructor
 @Component
 public class ExpiryTransaction {
@@ -76,14 +77,14 @@ public class ExpiryTransaction {
                             .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
                             .orderStatus(OrderStatusEnum.ORDER_EXPIRED).build());
                     break;
-                case "PAS":
+                case "PAS", "PLNPOST":
                     postpaidElectricityKafkaTemplate.send(KafkaTopicConfig.UPDATE_POSTPAID_ELECTRICITY_TRANSACTION, PostpaidElectricitiesTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
                             .orderStatus(OrderStatusEnum.ORDER_EXPIRED)
                             .build());
                     break;
-                case "PRA":
+                case "PRA", "PLNPRE":
                     prepaidElectricityKafkaTemplate.send(KafkaTopicConfig.UPDATE_PREPAID_ELECTRICITY_TRANSACTION, PrepaidElectricitiesTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
