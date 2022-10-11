@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.UUID;
 
 import id.holigo.services.common.model.DepositTransactionDto;
+import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import org.springframework.context.annotation.Bean;
@@ -251,6 +252,13 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
             switch (transaction.getTransactionType()) {
                 case "AIR" -> {
                     airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
+                }
+                case "HTD" -> {
+                    depositService.cancelDeposit(DepositTransactionDto.builder()
+                            .id(Long.parseLong(transaction.getTransactionId()))
+                            .orderStatus(stateContext.getTarget().getId())
+                            .paymentStatus(PaymentStatusEnum.PAYMENT_CANCELED)
+                            .build());
                 }
             }
         };

@@ -7,9 +7,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import id.holigo.services.common.model.DepositTransactionDto;
-import id.holigo.services.common.model.IncrementUserClubDto;
-import id.holigo.services.common.model.PointDto;
+import id.holigo.services.common.model.*;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import id.holigo.services.common.events.TransactionEvent;
-import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
@@ -217,17 +214,20 @@ public class TransactionListener {
             transaction.setPointAmount(transactionDto.getPointAmount());
             transaction.setPaymentServiceId(transactionDto.getPaymentServiceId());
             transaction.setVoucherCode(transactionDto.getVoucherCode());
-            if (transaction.getTransactionType().equals("HTD")) {
-                depositService.issuedDeposit(DepositTransactionDto.builder()
-                        .id(Long.valueOf(transaction.getTransactionId()))
-                        .paymentStatus(transaction.getPaymentStatus())
-                        .orderStatus(transaction.getOrderStatus())
-                        .paymentServiceId(transaction.getPaymentServiceId())
-                        .fareAmount(transaction.getFareAmount())
-                        .paymentId(transaction.getPaymentId())
-                        .build());
-            }
             transactionRepository.save(transaction);
+            if (transaction.getTransactionType().equals("HTD")) {
+                if (transaction.getPaymentStatus().equals(PaymentStatusEnum.PAID)) {
+                    depositService.issuedDeposit(DepositTransactionDto.builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus())
+                            .orderStatus(transaction.getOrderStatus())
+                            .paymentServiceId(transaction.getPaymentServiceId())
+                            .fareAmount(transaction.getFareAmount())
+                            .paymentId(transaction.getPaymentId())
+                            .build());
+                }
+            }
+
         }
     }
 }

@@ -68,8 +68,8 @@ public class TransactionController {
 
     @PutMapping(path = "/api/v1/transactions/{id}")
     public ResponseEntity<TransactionDtoForUser> cancelTransaction(@PathVariable("id") UUID id, @RequestHeader("user-id") Long userId) throws JMSException {
-        orderStatusTransactionService.cancelTransaction(id);
         paymentStatusTransactionService.paymentHasCanceled(id);
+        orderStatusTransactionService.cancelTransaction(id);
         TransactionDtoForUser transactionDtoForUser = transactionService.getTransactionByIdForUser(id);
         return new ResponseEntity<>(transactionDtoForUser, HttpStatus.OK);
     }

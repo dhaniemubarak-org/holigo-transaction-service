@@ -20,4 +20,9 @@ public class DepositServiceImpl implements DepositService {
     public void issuedDeposit(DepositTransactionDto depositTransactionDto) {
         depositTransactionKafkaTemplate.send(KafkaTopicConfig.UPDATE_DEPOSIT_TRANSACTION, depositTransactionDto);
     }
+
+    @Override
+    public void cancelDeposit(DepositTransactionDto depositTransactionDto) {
+        depositTransactionKafkaTemplate.send(KafkaTopicConfig.UPDATE_DEPOSIT_TRANSACTION, depositTransactionDto);
+    }
 }
