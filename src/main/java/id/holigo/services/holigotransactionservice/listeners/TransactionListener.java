@@ -216,7 +216,7 @@ public class TransactionListener {
             transaction.setVoucherCode(transactionDto.getVoucherCode());
             transactionRepository.save(transaction);
             if (transaction.getTransactionType().equals("HTD")) {
-                if (transaction.getPaymentStatus().equals(PaymentStatusEnum.PAID)) {
+                if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
                     depositService.issuedDeposit(DepositTransactionDto.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
                             .paymentStatus(transaction.getPaymentStatus())
