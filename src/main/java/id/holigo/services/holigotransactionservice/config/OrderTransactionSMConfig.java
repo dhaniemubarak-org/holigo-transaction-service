@@ -5,8 +5,10 @@ import java.util.UUID;
 
 import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.PaymentStatusEnum;
+import id.holigo.services.common.model.hotel.HotelTransactionDto;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
+import id.holigo.services.holigotransactionservice.services.hotel.HotelService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -78,6 +80,8 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     private final AirlinesService airlinesService;
 
     private final DepositService depositService;
+
+    private final HotelService hotelService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -231,6 +235,13 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                             .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                             .transactionId(transaction.getId()).build();
                     postpaidCreditCardTransactionService.issuedTransaction(postpaidCreditcardTransactionDto);
+                }
+                case "HTL" -> {
+                    HotelTransactionDto hotelTransactionDto = HotelTransactionDto
+                            .builder().id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build();
+                    hotelService.issuedTransaction(hotelTransactionDto);
                 }
                 case "HTD" -> depositService.issuedDeposit(DepositTransactionDto.builder()
                         .id(Long.valueOf(transaction.getTransactionId()))

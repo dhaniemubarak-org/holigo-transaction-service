@@ -41,6 +41,8 @@ public class JmsConfig {
     public static final String DEBIT_POINT = "debit-point";
     public static final String CREDIT_POINT = "credit-point";
 
+    public static final String ISSUED_HOTEL_BY_ID = "issued-hotel-by-id";
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
