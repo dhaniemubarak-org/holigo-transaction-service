@@ -141,10 +141,12 @@ public class TransactionListener {
                 case ISSUED:
                     orderStatusTransactionService.issuedSuccess(transaction.getId());
                     paymentService.transactionIssued(transactionDtoForPayment);
-                    IncrementUserClubDto incrementUserClubDto = IncrementUserClubDto.builder()
-                            .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
-                            .fareAmount(transaction.getFareAmount()).build();
-                    holiclubService.incrementUserClub(incrementUserClubDto);
+                    if (!transaction.getTransactionType().equals("HTD")) {
+                        IncrementUserClubDto incrementUserClubDto = IncrementUserClubDto.builder()
+                                .invoiceNumber(transaction.getInvoiceNumber()).userId(transaction.getUserId())
+                                .fareAmount(transaction.getFareAmount()).build();
+                        holiclubService.incrementUserClub(incrementUserClubDto);
+                    }
                     if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0 && !transaction.getIsPointSent()) {
                         PointDto pointDto = PointDto.builder().creditAmount(transaction.getHpAmount().intValue())
                                 .transactionId(transaction.getId()).paymentId(transaction.getPaymentId())
