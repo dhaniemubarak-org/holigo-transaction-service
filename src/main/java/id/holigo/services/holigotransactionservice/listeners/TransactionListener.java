@@ -216,6 +216,7 @@ public class TransactionListener {
             transaction.setPointAmount(transactionDto.getPointAmount());
             transaction.setPaymentServiceId(transactionDto.getPaymentServiceId());
             transaction.setVoucherCode(transactionDto.getVoucherCode());
+            transaction.setDiscountAmount(transactionDto.getDiscountAmount());
             transactionRepository.save(transaction);
             if (transaction.getTransactionType().equals("HTD")) {
                 if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
