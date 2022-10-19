@@ -125,6 +125,9 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                 .withExternal().source(OrderStatusEnum.PROCESS_ISSUED).target(OrderStatusEnum.RETRYING_ISSUED)
                 .event(OrderStatusEvent.RETRYING_ISSUED)
                 .and()
+                .withExternal().source(OrderStatusEnum.WAITING_ISSUED).target(OrderStatusEnum.RETRYING_ISSUED)
+                .event(OrderStatusEvent.RETRYING_ISSUED)
+                .and()
                 .withExternal().source(OrderStatusEnum.RETRYING_ISSUED).target(OrderStatusEnum.ISSUED)
                 .event(OrderStatusEvent.ISSUED_SUCCESS)
                 .and()
@@ -261,16 +264,12 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
             switch (transaction.getTransactionType()) {
-                case "AIR" -> {
-                    airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
-                }
-                case "HTD" -> {
-                    depositService.cancelDeposit(DepositTransactionDto.builder()
-                            .id(Long.parseLong(transaction.getTransactionId()))
-                            .orderStatus(stateContext.getTarget().getId())
-                            .paymentStatus(PaymentStatusEnum.PAYMENT_CANCELED)
-                            .build());
-                }
+                case "AIR" -> airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
+                case "HTD" -> depositService.cancelDeposit(DepositTransactionDto.builder()
+                        .id(Long.parseLong(transaction.getTransactionId()))
+                        .orderStatus(stateContext.getTarget().getId())
+                        .paymentStatus(PaymentStatusEnum.PAYMENT_CANCELED)
+                        .build());
             }
         };
     }
