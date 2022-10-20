@@ -23,6 +23,8 @@ public class PaymentDtoForUser implements Serializable {
 
     private BigDecimal paymentServiceAmount;
 
+    private BigDecimal depositAmount;
+
     private Boolean isSplitBill;
 
     private BigDecimal pointAmount;
