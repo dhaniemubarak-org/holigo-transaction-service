@@ -12,7 +12,6 @@ import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
@@ -35,7 +34,6 @@ import id.holigo.services.holigotransactionservice.services.payment.PaymentServi
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Component
 public class TransactionListener {
 
@@ -202,13 +200,9 @@ public class TransactionListener {
                 transactionDto.getPaymentStatus());
         if (fetchTransaction.isPresent()) {
             Transaction transaction = fetchTransaction.get();
-            log.info("Before start statemachine");
             StateMachine<PaymentStatusEnum, PaymentStatusEvent> paidTransaction = paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
-            if (paidTransaction.isComplete()) {
-                log.info("statemachine complete");
+            if (paidTransaction.getState().getId().equals(PaymentStatusEnum.PAID)) {
                 orderStatusTransactionService.processIssued(transaction.getId());
-            } else {
-                log.info("statemachine not complete");
             }
         }
     }
