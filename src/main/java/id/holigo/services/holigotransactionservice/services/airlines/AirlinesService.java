@@ -7,4 +7,6 @@ public interface AirlinesService {
     AirlinesTransactionDtoForUser getTransaction(Long id);
 
     void cancelTransaction(Long id);
+
+    void issuedTransaction(Long id);
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 import id.holigo.services.common.model.PaymentDto;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
+import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionService;
 import id.holigo.services.holigotransactionservice.services.PaymentStatusTransactionServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<PaymentStatusEnum, PaymentStatusEvent> {
     private final TransactionRepository transactionRepository;
 
+    private final OrderStatusTransactionService orderStatusTransactionService;
+
     private final KafkaTemplate<String, PaymentDto> paymentKafkaTemplate;
 
     @Override
@@ -47,7 +50,7 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
     public void configure(StateMachineTransitionConfigurer<PaymentStatusEnum, PaymentStatusEvent> transitions)
             throws Exception {
         transitions.withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAID)
-                .event(PaymentStatusEvent.PAYMENT_PAID)
+                .event(PaymentStatusEvent.PAYMENT_PAID).action(paymentPaidAction())
                 .and().withExternal().source(PaymentStatusEnum.SELECTING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
                 .event(PaymentStatusEvent.PAYMENT_EXPIRED).action(paymentExpiredAction())
                 .and().withExternal().source(PaymentStatusEnum.WAITING_PAYMENT).target(PaymentStatusEnum.PAYMENT_EXPIRED)
@@ -96,6 +99,14 @@ public class PaymentTransactionSMConfig extends StateMachineConfigurerAdapter<Pa
                         .transactionId(transaction.getId())
                         .status(PaymentStatusEnum.PAYMENT_CANCELED).build());
             }
+        };
+    }
+    @Bean
+    public Action<PaymentStatusEnum, PaymentStatusEvent> paymentPaidAction() {
+        return stateContext -> {
+            Transaction transaction = transactionRepository.getById(UUID.fromString(
+                    stateContext.getMessageHeader(PaymentStatusTransactionServiceImpl.PAYMENT_STATUS_HEADER).toString()));
+            orderStatusTransactionService.processIssued(transaction.getId());
         };
     }
 }

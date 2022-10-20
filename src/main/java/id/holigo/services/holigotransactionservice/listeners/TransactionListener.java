@@ -200,7 +200,7 @@ public class TransactionListener {
         if (fetchTransaction.isPresent()) {
             Transaction transaction = fetchTransaction.get();
             paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
-            orderStatusTransactionService.processIssued(transaction.getId());
+//            orderStatusTransactionService.processIssued(transaction.getId());
         }
     }
 

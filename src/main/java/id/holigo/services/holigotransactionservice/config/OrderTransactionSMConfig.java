@@ -254,6 +254,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                         .fareAmount(transaction.getFareAmount())
                         .paymentId(transaction.getPaymentId())
                         .build());
+                case "AIR" -> airlinesService.issuedTransaction(Long.parseLong(transaction.getTransactionId()));
             }
         };
     }
