@@ -8,6 +8,7 @@ import javax.jms.Message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import id.holigo.services.common.model.*;
+import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
@@ -18,6 +19,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,8 +201,10 @@ public class TransactionListener {
                 transactionDto.getPaymentStatus());
         if (fetchTransaction.isPresent()) {
             Transaction transaction = fetchTransaction.get();
-            paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
-//            orderStatusTransactionService.processIssued(transaction.getId());
+            StateMachine<PaymentStatusEnum, PaymentStatusEvent> paidTransaction = paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
+            if (paidTransaction.isComplete()) {
+                orderStatusTransactionService.processIssued(transaction.getId());
+            }
         }
     }
 
