@@ -40,8 +40,9 @@ public class JmsConfig {
     public static final String DETAIL_PRODUCT_HOTEL_TRANSACTION = "detail-product-hotel-transaction";
     public static final String DEBIT_POINT = "debit-point";
     public static final String CREDIT_POINT = "credit-point";
-
     public static final String ISSUED_HOTEL_BY_ID = "issued-hotel-by-id";
+    public static final String ISSUED_POSTPAID_GAS_BY_ID = "isued-postpaid-gas-by-id";
+    public static final String GET_DETAIL_TRANSACTION_GAS = "get-detail-transaction-gas";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

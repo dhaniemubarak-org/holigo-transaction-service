@@ -4,6 +4,7 @@ import javax.jms.JMSException;
 
 import id.holigo.services.holigotransactionservice.sender.*;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidGasTransactionService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class ProductRoute {
     private final ProductCreditcard productCreditcard;
 
     private final ProductHotel productHotel;
+    private final PostpaidGasTransactionService postpaidGasTransactionService;
 
     @Transactional
     public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
@@ -55,6 +57,7 @@ public class ProductRoute {
             case "CC" -> fetchData = productCreditcard.sendDetailProduct(id).getDetail();
             case "HTL" -> fetchData = productHotel.sendDetailProduct(id).getDetail();
             case "AIR" -> fetchData = airlinesService.getTransaction(id);
+            case "GAS" -> fetchData = postpaidGasTransactionService.sendDetailProduct(id).getDetail();
         }
         return fetchData;
     }
