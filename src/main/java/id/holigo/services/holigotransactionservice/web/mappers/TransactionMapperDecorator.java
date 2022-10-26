@@ -55,11 +55,7 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
         UserDto userDto = userService.getUser(transactionDto.getUserId());
         if (userDto != null) {
             if (userDto.getParent() != null) {
-                if (userDto.getParent().getId().equals(userDto.getId())) {
-                    transaction.setUserParentId(userDto.getParent().getId());
-                } else {
-                    transaction.setUserParentId(userDto.getParent().getId());
-                }
+                transaction.setUserParentId(userDto.getParent().getId());
             }
             transaction.setOfficialId(userDto.getOfficialId());
         }
