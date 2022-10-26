@@ -144,4 +144,8 @@ public class Transaction {
     @Builder.Default
     private Boolean isPointSent = false;
 
+    @Column(columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isPrSent = false;
+
 }

@@ -12,6 +12,7 @@ import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
@@ -32,8 +33,8 @@ import id.holigo.services.holigotransactionservice.services.PaymentStatusTransac
 import id.holigo.services.holigotransactionservice.services.TransactionService;
 import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
-import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Component
 public class TransactionListener {
 
@@ -150,7 +151,8 @@ public class TransactionListener {
                     }
                     if (transaction.getHpAmount().compareTo(BigDecimal.ZERO) > 0 && !transaction.getIsPointSent()) {
                         PointDto pointDto = PointDto.builder().creditAmount(transaction.getHpAmount().intValue())
-                                .transactionId(transaction.getId()).paymentId(transaction.getPaymentId())
+                                .transactionId(transaction.getId())
+                                .paymentId(transaction.getPaymentId())
                                 .informationIndex("pointStatement.cashBackHoliPoint")
                                 .transactionType(transaction.getTransactionType())
                                 .invoiceNumber(transaction.getInvoiceNumber())
@@ -163,7 +165,29 @@ public class TransactionListener {
                                 transactionRepository.save(transaction);
                             }
                         } catch (JMSException | JsonProcessingException e) {
-                            throw new RuntimeException(e);
+                            log.error("Error : {}", e.getMessage());
+                        }
+                    }
+                    if (transaction.getPrAmount().compareTo(BigDecimal.ZERO) > 0 && transaction.getUserParentId() != null) {
+                        String[] invoiceSplit = transaction.getInvoiceNumber().split("/");
+                        String preInvoice = invoiceSplit[0] + "**********";
+                        String postInvoiceNumber = (invoiceSplit[2].length() > 2) ? invoiceSplit[2].replace(invoiceSplit[2].substring(0, 2), "*") : invoiceSplit[2];
+                        PointDto pointDto = PointDto.builder().creditAmount(transaction.getPrAmount().intValue())
+                                .transactionId(transaction.getId())
+                                .paymentId(transaction.getPaymentId())
+                                .informationIndex("pointStatement.pointReferralReward")
+                                .transactionType(transaction.getTransactionType())
+                                .userId(transaction.getUserParentId())
+                                .invoiceNumber(preInvoice + postInvoiceNumber)
+                                .build();
+                        try {
+                            PointDto resultPointDto = pointService.credit(pointDto);
+                            if (resultPointDto.getIsValid()) {
+                                transaction.setIsPrSent(resultPointDto.getIsValid());
+                                transactionRepository.save(transaction);
+                            }
+                        } catch (JMSException | JsonProcessingException e) {
+                            log.error("Error : {}", e.getMessage());
                         }
                     }
 
