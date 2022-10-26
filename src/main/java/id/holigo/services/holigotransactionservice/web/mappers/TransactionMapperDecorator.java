@@ -59,7 +59,7 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
             }
             transaction.setOfficialId(userDto.getOfficialId());
         }
-        return transactionMapper.transactionDtoToTransaction(transactionDto);
+        return transaction;
     }
 
     public TransactionDto transactionToTransactionDto(Transaction transaction) {
