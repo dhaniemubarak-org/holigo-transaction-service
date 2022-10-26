@@ -60,8 +60,8 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
                 } else {
                     transaction.setUserParentId(userDto.getParent().getId());
                 }
-                transaction.setOfficialId(userDto.getOfficialId());
             }
+            transaction.setOfficialId(userDto.getOfficialId());
         }
         return transactionMapper.transactionDtoToTransaction(transactionDto);
     }
