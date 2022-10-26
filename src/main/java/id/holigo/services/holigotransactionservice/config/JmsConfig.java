@@ -43,6 +43,8 @@ public class JmsConfig {
     public static final String ISSUED_HOTEL_BY_ID = "issued-hotel-by-id";
     public static final String ISSUED_POSTPAID_GAS_BY_ID = "isued-postpaid-gas-by-id";
     public static final String GET_DETAIL_TRANSACTION_GAS = "get-detail-transaction-gas";
+    public static final String DETAIL_TRANSACTION_PRODUCT_STREAMING = "detail-transaction-product-streaming";
+    public static final String ISSUED_PREPAID_STREAMING_BY_ID = "issued-prepaid-streaming-by-id";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
