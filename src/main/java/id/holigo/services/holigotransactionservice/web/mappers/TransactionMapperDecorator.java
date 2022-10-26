@@ -1,5 +1,7 @@
 package id.holigo.services.holigotransactionservice.web.mappers;
 
+import id.holigo.services.common.model.UserDto;
+import id.holigo.services.holigotransactionservice.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import id.holigo.services.common.model.PaymentDtoForUser;
@@ -12,8 +14,19 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
 
     private TransactionMapper transactionMapper;
 
-    @Autowired
     private PaymentService paymentService;
+
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setPaymentService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @Autowired
     public void setTransactionMapper(TransactionMapper transactionMapper) {
@@ -38,6 +51,12 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
     }
 
     public Transaction transactionDtoToTransaction(TransactionDto transactionDto) {
+        Transaction transaction = transactionMapper.transactionDtoToTransaction(transactionDto);
+        UserDto userDto = userService.getUser(transactionDto.getUserId());
+        if (userDto != null) {
+            transaction.setUserParentId(userDto.getParent().getId());
+            transaction.setOfficialId(userDto.getOfficialId());
+        }
         return transactionMapper.transactionDtoToTransaction(transactionDto);
     }
 

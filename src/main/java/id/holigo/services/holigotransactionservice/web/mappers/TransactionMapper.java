@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 @Mapper
 public interface TransactionMapper {
 
+    @Mapping(target = "userParentId", ignore = true)
+    @Mapping(target = "officialId", ignore = true)
+    @Mapping(target = "isPointSent", ignore = true)
     @Mapping(target = "voucherCode", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -41,6 +44,9 @@ public interface TransactionMapper {
     @Mapping(target = "detail", ignore = true)
     TransactionDtoForUser transactionToTransactionDtoForUser(Transaction transaction);
 
+    @Mapping(target = "userParentId", ignore = true)
+    @Mapping(target = "officialId",ignore = true)
+    @Mapping(target = "isPointSent", ignore = true)
     Transaction transactionDtoToTransaction(TransactionDto transactionDto);
 
     TransactionDto transactionToTransactionDto(Transaction transaction);

@@ -47,6 +47,10 @@ public class Transaction {
 
     private Long userId;
 
+    private Long userParentId;
+
+    private Long officialId;
+
     @CreationTimestamp
     @Column(updatable = false)
     private Timestamp createdAt;
