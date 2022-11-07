@@ -23,13 +23,11 @@ public class PrepaidStreamingTransactionImpl implements PrepaidStreamingTransact
     private final ObjectMapper objectMapper;
 
     public void issuedTransaction(PrepaidStreamingTransactionDto prepaidStreamingTransactionDto){
-        log.info("IssuedTransactioon PrepaidStreamingTransactionDto -> {}");
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_PREPAID_STREAMING_BY_ID,
                 new IssuedPrepaidStreamingEvent(prepaidStreamingTransactionDto));
     }
 
     public DetailProductTransaction sendDetailProduct(Long productId) throws JMSException{
-        log.info("DetailTransaction PrepaidStreamingDto -> {}", productId);
         DetailProductTransaction detailProductTransaction = DetailProductTransaction.builder().id(productId).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_TRANSACTION_PRODUCT_STREAMING, session -> {
            Message message1;
@@ -43,6 +41,7 @@ public class PrepaidStreamingTransactionImpl implements PrepaidStreamingTransact
         });
         DetailProductTransaction retrieveDetailProductTransaction = new DetailProductTransaction();
         try{
+            assert message != null;
             retrieveDetailProductTransaction = objectMapper.readValue(message.getBody(String.class), DetailProductTransaction.class);
         }catch (Exception e){
             e.printStackTrace();
