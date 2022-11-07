@@ -1,15 +1,18 @@
 package id.holigo.services.holigotransactionservice.services;
 
 import id.holigo.services.common.model.OrderStatusEnum;
+import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.common.model.TransactionDto;
 import id.holigo.services.holigotransactionservice.component.ProductRoute;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
+import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.repositories.specification.GenericAndSpecification;
 import id.holigo.services.holigotransactionservice.repositories.specification.SearchCriteria;
 import id.holigo.services.holigotransactionservice.repositories.specification.SearchOperation;
 import id.holigo.services.holigotransactionservice.repositories.specification.TransactionSpecification;
+import id.holigo.services.holigotransactionservice.services.payment.PaymentService;
 import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper;
 import id.holigo.services.holigotransactionservice.web.model.*;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +22,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import java.sql.Date;
@@ -41,6 +46,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final PaymentStatusTransactionService paymentStatusTransactionService;
 
     private final TransactionSpecification transactionSpecification;
+
+    private final PaymentService paymentService;
 
     private ProductRoute productRoute;
 
@@ -69,28 +76,29 @@ public class TransactionServiceImpl implements TransactionService {
         GenericAndSpecification<Transaction> genericAndSpecification = new GenericAndSpecification<>();
         genericAndSpecification.add(new SearchCriteria("userId", userId, SearchOperation.EQUAL));
 
-        if (transactionType!=null){
-            switch (transactionType){
-                case "AIR", "HTL" -> genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+        if (transactionType != null) {
+            switch (transactionType) {
+                case "AIR", "HTL" ->
+                        genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
                 case "PRE" -> {
                     PrepaidEnum[] prepaidEnums = PrepaidEnum.values();
-                    for (PrepaidEnum prepaidEnum: prepaidEnums
-                         ) {
+                    for (PrepaidEnum prepaidEnum : prepaidEnums
+                    ) {
                         serviceCodes.add(prepaidEnum.name());
                     }
                 }
                 case "POST" -> {
                     PostpaidEnum[] postpaidEnums = PostpaidEnum.values();
-                    for (PostpaidEnum postpaidEnum: postpaidEnums
-                         ) {
+                    for (PostpaidEnum postpaidEnum : postpaidEnums
+                    ) {
                         serviceCodes.add(postpaidEnum.name());
                     }
                 }
             }
         }
 
-        if (status!=null){
-            switch (status){
+        if (status != null) {
+            switch (status) {
                 case SELECTING_PAYMENT -> {
                     paymentStatus.add(PaymentStatusEnum.SELECTING_PAYMENT);
                     orderStatus.add(OrderStatusEnum.PROCESS_BOOK);
@@ -197,6 +205,18 @@ public class TransactionServiceImpl implements TransactionService {
                 }
             }
 
+        }
+    }
+
+    @Transactional
+    @Override
+    public void checkPaymentStatus(Transaction transaction) {
+        PaymentDtoForUser payment = paymentService.getPayment(transaction.getPaymentId());
+        if (payment.getStatus().equals(PaymentStatusEnum.PAID)) {
+            StateMachine<PaymentStatusEnum, PaymentStatusEvent> paidTransaction = paymentStatusTransactionService.transactionHasBeenPaid(transaction.getId());
+            if (paidTransaction.getState().getId().equals(PaymentStatusEnum.PAID)) {
+                orderStatusTransactionService.processIssued(transaction.getId());
+            }
         }
     }
 

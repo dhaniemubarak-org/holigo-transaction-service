@@ -22,4 +22,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     Page<Transaction> findAllByUserId(Long userId, Pageable pageable);
 
     List<Transaction> findAllByPaymentStatusInAndExpiredAtLessThanEqual(List<PaymentStatusEnum> paymentStatuses, Timestamp timestamp);
+
+    List<Transaction> findAllByPaymentServiceIdAndPaymentStatus(String paymentServiceId, PaymentStatusEnum paymentStatusEnum);
 }
