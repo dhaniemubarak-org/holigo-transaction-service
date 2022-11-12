@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import id.holigo.services.common.model.DetailProductTransaction;
 import id.holigo.services.holigotransactionservice.config.JmsConfig;
+import id.holigo.services.holigotransactionservice.services.hotel.HotelServiceFeignClient;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,9 @@ public class ProductHotel {
 
     @Autowired
     private final ObjectMapper objectMapper;
+
+    @Autowired
+    private final HotelServiceFeignClient hotelServiceFeignClient;
 
     @Transactional
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
@@ -48,5 +53,11 @@ public class ProductHotel {
             e.printStackTrace();
         }
         return detailProduct;
+    }
+
+
+    public Object getDetailTransaction(Long id){
+        ResponseEntity<Object> responseDetailTransaction = hotelServiceFeignClient.getDetailTransaction(id);
+        return responseDetailTransaction.getBody();
     }
 }

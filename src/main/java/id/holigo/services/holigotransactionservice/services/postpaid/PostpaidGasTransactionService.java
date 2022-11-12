@@ -8,4 +8,5 @@ import javax.jms.JMSException;
 public interface PostpaidGasTransactionService {
     void issuedTransaction(PostpaidGasTransactionDto postpaidGasTransactionDto);
     DetailProductTransaction sendDetailProduct(Long productId) throws JMSException;
+    Object getDetailTransaction(Long id);
 }

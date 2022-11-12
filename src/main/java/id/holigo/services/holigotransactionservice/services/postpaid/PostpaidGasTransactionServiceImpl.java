@@ -25,6 +25,7 @@ public class PostpaidGasTransactionServiceImpl implements PostpaidGasTransaction
     private JmsTemplate jmsTemplate;
 
     private final ObjectMapper objectMapper;
+    private final PostpaidGasServiceFeignClient postpaidGasServiceFeignClient;
 
     @Autowired
     public void setJmsTemplate(JmsTemplate jmsTemplate){this.jmsTemplate = jmsTemplate;}
@@ -60,5 +61,10 @@ public class PostpaidGasTransactionServiceImpl implements PostpaidGasTransaction
             e.printStackTrace();
         }
         return detailProduct;
+    }
+
+    @Override
+    public Object getDetailTransaction(Long id){
+        return postpaidGasServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }

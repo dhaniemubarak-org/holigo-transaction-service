@@ -7,6 +7,7 @@ import javax.jms.Session;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesServiceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -27,7 +28,7 @@ public class ProductPLNPAS {
 
     @Autowired
     private final ObjectMapper objectMapper;
-
+    private final PostpaidElectricitiesServiceFeignClient postpaidElectricitiesServiceFeignClient;
     public DetailProductTransaction sendDetalProduct(Long id) throws JMSException{
         DetailProductTransaction detailProductTransaction = DetailProductTransaction.builder().id(id).build();
         Message message = jmsTemplate.sendAndReceive(JmsConfig.DETAIL_PRODUCT_PLNPAS, new MessageCreator() {
@@ -54,5 +55,9 @@ public class ProductPLNPAS {
         }
 
         return productTransaction;
+    }
+
+    public Object getDetailTransaction(Long id){
+        return postpaidElectricitiesServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }

@@ -5,6 +5,7 @@ import javax.jms.Message;
 import javax.transaction.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaServiceFeignClient;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import id.holigo.services.common.model.DetailProductTransaction;
@@ -18,6 +19,7 @@ public class ProductPulsa {
     private final JmsTemplate jmsTemplate;
 
     private final ObjectMapper objectMapper;
+    private final PrepaidPulsaServiceFeignClient prepaidPulsaServiceFeignClient;
 
     @Transactional
     public DetailProductTransaction sendDetailProduct(Long productId, String locale) throws JMSException {
@@ -44,5 +46,9 @@ public class ProductPulsa {
             e.printStackTrace();
         }
         return detailProduct;
+    }
+
+    public Object getDetailTransaction(Long id, String locale){
+        return prepaidPulsaServiceFeignClient.getDetailTransaction(id, locale).getBody();
     }
 }

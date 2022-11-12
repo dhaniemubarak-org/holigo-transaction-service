@@ -7,6 +7,8 @@ import javax.jms.Session;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidCreditCardServiceFeignClient;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -17,7 +19,7 @@ import id.holigo.services.holigotransactionservice.config.JmsConfig;
 import lombok.AllArgsConstructor;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductCreditcard {
 
     @Autowired
@@ -25,6 +27,8 @@ public class ProductCreditcard {
 
     @Autowired
     private final ObjectMapper objectMapper;
+
+    private final PostpaidCreditCardServiceFeignClient postpaidCreditCardServiceFeignClient;
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
         DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(id).build();
@@ -52,5 +56,9 @@ public class ProductCreditcard {
         }
 
         return detailProduct;
+    }
+
+    public Object getDetailTransaction(Long id){
+        return postpaidCreditCardServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }
