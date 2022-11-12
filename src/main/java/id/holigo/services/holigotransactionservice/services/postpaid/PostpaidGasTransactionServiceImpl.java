@@ -32,8 +32,6 @@ public class PostpaidGasTransactionServiceImpl implements PostpaidGasTransaction
 
     @Override
     public void issuedTransaction(PostpaidGasTransactionDto postpaidGasTransactionDto) {
-        log.info("issuedTransaction PostpaidInsuranceTransactionDto is running dto -> {}",
-                postpaidGasTransactionDto);
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_POSTPAID_GAS_BY_ID,
                 new IssuedPostpaidGasEvent(postpaidGasTransactionDto));
     }

@@ -5,10 +5,14 @@ import java.util.UUID;
 
 import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.PaymentStatusEnum;
+import id.holigo.services.common.model.gas.PostpaidGasTransactionDto;
 import id.holigo.services.common.model.hotel.HotelTransactionDto;
+import id.holigo.services.common.model.streaming.PrepaidStreamingTransactionDto;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.hotel.HotelService;
+import id.holigo.services.holigotransactionservice.services.postpaid.*;
+import id.holigo.services.holigotransactionservice.services.prepaid.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -33,17 +37,6 @@ import id.holigo.services.holigotransactionservice.domain.Transaction;
 import id.holigo.services.holigotransactionservice.events.OrderStatusEvent;
 import id.holigo.services.holigotransactionservice.repositories.TransactionRepository;
 import id.holigo.services.holigotransactionservice.services.OrderStatusTransactionServiceImpl;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidCreditCardTransactionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidElectricitiesTransactionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidInsuranceTransactionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidMultifinanceTransactionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidPdamTransactionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTelephoneTranasctionService;
-import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTvInternetTransactionService;
-import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidElectricitiesTransactionService;
-import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidGameTransactionService;
-import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidPulsaTransactionService;
-import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidWalletTransactionService;
 import id.holigo.services.common.model.pdam.PostpaidPdamTransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +69,10 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     private final PostpaidMultifinanceTransactionService postpaidMultifinanceTransactionService;
 
     private final PostpaidCreditCardTransactionService postpaidCreditCardTransactionService;
+
+    private final PostpaidGasTransactionService postpaidGasTransactionService;
+
+    private final PrepaidStreamingTransactionService prepaidStreamingTransactionService;
 
     private final AirlinesService airlinesService;
 
@@ -257,6 +254,15 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                         .paymentId(transaction.getPaymentId())
                         .build());
                 case "AIR" -> airlinesService.issuedTransaction(Long.parseLong(transaction.getTransactionId()));
+                case "GAS" -> postpaidGasTransactionService.issuedTransaction(PostpaidGasTransactionDto.builder()
+                        .id(Long.valueOf(transaction.getTransactionId()))
+                        .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                        .transactionId(transaction.getId()).build());
+                case "STREAMING" ->
+                        prepaidStreamingTransactionService.issuedTransaction(PrepaidStreamingTransactionDto.builder()
+                                .id(Long.valueOf(transaction.getTransactionId()))
+                                .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                                .transactionId(transaction.getId()).build());
             }
         };
     }
