@@ -12,13 +12,12 @@ import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
+import id.holigo.services.holigotransactionservice.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
@@ -39,6 +38,8 @@ import id.holigo.services.holigotransactionservice.web.mappers.TransactionMapper
 public class TransactionListener {
 
     private DepositService depositService;
+
+    private UserService userService;
 
     @Autowired
     public void setDepositService(DepositService depositService) {
@@ -108,9 +109,14 @@ public class TransactionListener {
         this.pointService = pointService;
     }
 
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
     @Transactional
     @JmsListener(destination = JmsConfig.CREATE_NEW_TRANSACTION)
-    public void listenForCreateNewTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
+    public void listenForCreateNewTransaction(@Payload TransactionDto transactionDto,
                                               Message message) throws JmsException, JMSException {
 
         TransactionDto transaction = transactionService.createNewTransaction(transactionDto);
@@ -119,7 +125,7 @@ public class TransactionListener {
     }
 
     @JmsListener(destination = JmsConfig.GET_TRANSACTION_BY_ID)
-    public void listenForGetTransaction(@Payload TransactionDto transactionDto, @Headers MessageHeaders headers,
+    public void listenForGetTransaction(@Payload TransactionDto transactionDto,
                                         Message message) throws JmsException, JMSException {
         TransactionDto transaction = transactionService.getTransactionById(transactionDto.getId());
         if (transaction != null) {
@@ -185,6 +191,7 @@ public class TransactionListener {
                             if (resultPointDto.getIsValid()) {
                                 transaction.setIsPrSent(resultPointDto.getIsValid());
                                 transactionRepository.save(transaction);
+                                userService.updatePointReferral(transaction.getUserParentId(), transaction.getPrAmount().intValue());
                             }
                         } catch (JMSException | JsonProcessingException e) {
                             log.error("Error : {}", e.getMessage());
