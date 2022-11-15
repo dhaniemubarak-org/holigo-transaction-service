@@ -1,0 +1,35 @@
+package id.holigo.services.common.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserReferralDto implements Serializable {
+
+    private Long id;
+
+    private String referral;
+
+    private Integer changeGranted;
+
+    private String name;
+
+    private String photoProfileUrl;
+
+    private Boolean isOfficialAccount;
+
+    private String note;
+
+    private Integer followers;
+
+    private Integer point;
+
+    private ReferralStatusEnum status;
+}
