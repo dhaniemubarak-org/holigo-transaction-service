@@ -6,6 +6,7 @@ import id.holigo.services.holigotransactionservice.sender.*;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidGasTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidStreamingTransactionService;
+import id.holigo.services.holigotransactionservice.services.train.TrainService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductRoute {
     private final AirlinesService airlinesService;
+
+    private final TrainService trainService;
 
     private final ProductPulsa productPulsa;
 
@@ -61,6 +64,7 @@ public class ProductRoute {
             case "AIR" -> fetchData = airlinesService.getTransaction(id);
             case "GAS" -> fetchData = postpaidGasTransactionService.sendDetailProduct(id).getDetail();
             case "STREAMING" -> fetchData = prepaidStreamingTransactionService.sendDetailProduct(id).getDetail();
+            case "TRAIN" -> fetchData = trainService.getTransaction(id);
         }
         return fetchData;
     }

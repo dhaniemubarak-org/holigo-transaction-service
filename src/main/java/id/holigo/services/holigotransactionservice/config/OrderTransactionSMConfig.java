@@ -13,6 +13,7 @@ import id.holigo.services.holigotransactionservice.services.deposit.DepositServi
 import id.holigo.services.holigotransactionservice.services.hotel.HotelService;
 import id.holigo.services.holigotransactionservice.services.postpaid.*;
 import id.holigo.services.holigotransactionservice.services.prepaid.*;
+import id.holigo.services.holigotransactionservice.services.train.TrainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -75,6 +76,8 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     private final PrepaidStreamingTransactionService prepaidStreamingTransactionService;
 
     private final AirlinesService airlinesService;
+
+    private final TrainService trainService;
 
     private final DepositService depositService;
 
@@ -274,6 +277,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                     stateContext.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
             switch (transaction.getTransactionType()) {
                 case "AIR" -> airlinesService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
+                case "TRAIN" -> trainService.cancelTransaction(Long.parseLong(transaction.getTransactionId()));
                 case "HTD" -> depositService.cancelDeposit(DepositTransactionDto.builder()
                         .id(Long.parseLong(transaction.getTransactionId()))
                         .orderStatus(stateContext.getTarget().getId())
