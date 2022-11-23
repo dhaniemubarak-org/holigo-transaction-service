@@ -159,8 +159,6 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
         return context -> {
             Transaction transaction = transactionRepository.getById(UUID.fromString(
                     context.getMessageHeader(OrderStatusTransactionServiceImpl.ORDER_STATUS_HEADER).toString()));
-            log.info("processIssued with payment status -> {}", transaction.getOrderStatus());
-            log.info("processIssued with order status -> {}", transaction.getOrderStatus());
             switch (transaction.getTransactionType()) {
                 case "PRA", "PLNPRE" -> {
                     PrepaidElectricitiesTransactionDto prepaidElectricitiesTransactionDto = PrepaidElectricitiesTransactionDto

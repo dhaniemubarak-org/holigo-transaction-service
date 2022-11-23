@@ -31,7 +31,9 @@ public class KafkaTopicConfig {
 
     public static final String UPDATE_HOTEL_TRANSACTION = "update-hotel-transaction";
 
-    public static final String UPDATE_AIRLINES_TRANSACTION = "update-airlines-transaction";
+    public static final String UPDATE_ORDER_STATUS_AIRLINES_TRANSACTION = "update-order-status-airlines-transaction";
+
+    public static final String UPDATE_PAYMENT_STATUS_AIRLINES_TRANSACTION = "update-payment-status-airlines-transaction";
     public static final String UPDATE_PAYMENT = "update-payment";
 
     public static final String CANCEL_PAYMENT = "cancel-payment";
