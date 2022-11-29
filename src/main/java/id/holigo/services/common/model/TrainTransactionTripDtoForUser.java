@@ -62,5 +62,7 @@ public class TrainTransactionTripDtoForUser implements Serializable {
 
     private BigDecimal hpcAmount;
 
+    private Integer segment;
+
     private String bookCode;
 }
