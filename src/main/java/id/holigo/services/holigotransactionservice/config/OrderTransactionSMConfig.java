@@ -255,6 +255,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                         .paymentId(transaction.getPaymentId())
                         .build());
                 case "AIR" -> airlinesService.issuedTransaction(Long.parseLong(transaction.getTransactionId()));
+                case "TRAIN" -> trainService.issuedTransaction(Long.parseLong(transaction.getTransactionId()));
                 case "GAS" -> postpaidGasTransactionService.issuedTransaction(PostpaidGasTransactionDto.builder()
                         .id(Long.valueOf(transaction.getTransactionId()))
                         .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())

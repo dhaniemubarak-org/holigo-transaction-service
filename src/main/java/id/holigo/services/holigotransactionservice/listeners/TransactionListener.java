@@ -13,6 +13,7 @@ import id.holigo.services.holigotransactionservice.services.airlines.AirlinesSer
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
+import id.holigo.services.holigotransactionservice.services.train.TrainService;
 import id.holigo.services.holigotransactionservice.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,13 @@ public class TransactionListener {
     private UserService userService;
 
     private AirlinesService airlinesService;
+
+    private TrainService trainService;
+
+    @Autowired
+    public void setTrainService(TrainService trainService) {
+        this.trainService = trainService;
+    }
 
     @Autowired
     public void setAirlinesService(AirlinesService airlinesService) {
@@ -273,7 +281,10 @@ public class TransactionListener {
                                 .build());
                     }
                 }
-                case "AIR" -> airlinesService.updatePayment(Long.valueOf(transaction.getTransactionId()), transaction.getPaymentStatus());
+                case "AIR" ->
+                        airlinesService.updatePayment(Long.valueOf(transaction.getTransactionId()), transaction.getPaymentStatus());
+                case "TRAIN" ->
+                        trainService.updatePayment(Long.valueOf(transaction.getTransactionId()), transaction.getPaymentStatus());
             }
 
         }
