@@ -46,5 +46,9 @@ public class TrainTransactionDtoForUser implements Serializable {
 
     private BigDecimal hpcAmount;
 
+    private Integer serviceId;
+
+    private Integer productId;
+
     private String seatMapUrl;
 }
