@@ -76,10 +76,8 @@ public class TransactionServiceImpl implements TransactionService {
         GenericAndSpecification<Transaction> genericAndSpecification = new GenericAndSpecification<>();
         genericAndSpecification.add(new SearchCriteria("userId", userId, SearchOperation.EQUAL));
 
-        if (transactionType != null) {
+        if (transactionType != null && !transactionType.equals("")) {
             switch (transactionType) {
-                case "AIR", "HTL" ->
-                        genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
                 case "PRE" -> {
                     PrepaidEnum[] prepaidEnums = PrepaidEnum.values();
                     for (PrepaidEnum prepaidEnum : prepaidEnums
@@ -94,6 +92,8 @@ public class TransactionServiceImpl implements TransactionService {
                         serviceCodes.add(postpaidEnum.name());
                     }
                 }
+                default -> genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+
             }
         }
 

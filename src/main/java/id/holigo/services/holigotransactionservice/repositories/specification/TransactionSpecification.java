@@ -3,7 +3,6 @@ package id.holigo.services.holigotransactionservice.repositories.specification;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.holigotransactionservice.domain.Transaction;
-import id.holigo.services.holigotransactionservice.web.model.PostpaidEnum;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
