@@ -1,14 +1,18 @@
 package id.holigo.services.holigotransactionservice.listeners;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import feign.FeignException;
 import id.holigo.services.common.model.*;
+import id.holigo.services.holigotransactionservice.domain.QueueUpdateUserReferralPoint;
 import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
+import id.holigo.services.holigotransactionservice.repositories.QueueUpdateUserReferralPointRepository;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
@@ -17,6 +21,8 @@ import id.holigo.services.holigotransactionservice.services.train.TrainService;
 import id.holigo.services.holigotransactionservice.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
@@ -46,6 +52,13 @@ public class TransactionListener {
     private AirlinesService airlinesService;
 
     private TrainService trainService;
+
+    private QueueUpdateUserReferralPointRepository queueUpdateUserReferralPointRepository;
+
+    @Autowired
+    public void setQueueUpdateUserReferralPointRepository(QueueUpdateUserReferralPointRepository queueUpdateUserReferralPointRepository) {
+        this.queueUpdateUserReferralPointRepository = queueUpdateUserReferralPointRepository;
+    }
 
     @Autowired
     public void setTrainService(TrainService trainService) {
@@ -207,7 +220,12 @@ public class TransactionListener {
                             if (resultPointDto.getIsValid()) {
                                 transaction.setIsPrSent(resultPointDto.getIsValid());
                                 transactionRepository.save(transaction);
-                                userService.updatePointReferral(transaction.getUserParentId(), transaction.getPrAmount().intValue());
+                                try {
+                                    ResponseEntity<HttpStatus> response = userService.updatePointReferral(transaction.getUserParentId(), transaction.getPrAmount().intValue());
+                                } catch (FeignException e) {
+                                    queueUpdateUserReferralPointRepository.save(QueueUpdateUserReferralPoint.builder()
+                                            .userId(transaction.getUserParentId()).hasSent(false).point(transaction.getPrAmount().intValue()).build());
+                                }
                             }
                         } catch (JMSException | JsonProcessingException e) {
                             log.error("Error : {}", e.getMessage());
