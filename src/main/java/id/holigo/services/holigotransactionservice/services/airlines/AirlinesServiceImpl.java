@@ -1,7 +1,6 @@
 package id.holigo.services.holigotransactionservice.services.airlines;
 
 import id.holigo.services.common.model.AirlinesTransactionDtoForUser;
-import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentStatusEnum;
 import id.holigo.services.holigotransactionservice.config.KafkaTopicConfig;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +28,19 @@ public class AirlinesServiceImpl implements AirlinesService {
     }
 
     @Override
+    public void updatePayment(Long id, PaymentStatusEnum paymentStatus) {
+        airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT_STATUS_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
+                .id(id)
+                .paymentStatus(paymentStatus)
+                .build());
+    }
+
+
+    @Override
     public void issuedTransaction(Long id) {
-        airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
+        airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_PAYMENT_STATUS_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
                 .id(id)
                 .paymentStatus(PaymentStatusEnum.PAID)
-                .orderStatus(OrderStatusEnum.PROCESS_ISSUED)
                 .build());
     }
 

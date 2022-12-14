@@ -148,4 +148,11 @@ public class Transaction {
     @Builder.Default
     private Boolean isPrSent = false;
 
+    @Column(columnDefinition = "decimal(10,2) default 0")
+    private BigDecimal apAmount;
+
+    @Column(columnDefinition = "decimal(10,2) default 0")
+    private BigDecimal subsidyAmount;
+
+    private String supplierTransactionId;
 }

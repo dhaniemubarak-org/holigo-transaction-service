@@ -9,9 +9,11 @@ import javax.jms.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import id.holigo.services.common.model.*;
 import id.holigo.services.holigotransactionservice.events.PaymentStatusEvent;
+import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
 import id.holigo.services.holigotransactionservice.services.deposit.DepositService;
 import id.holigo.services.holigotransactionservice.services.holiclub.HoliclubService;
 import id.holigo.services.holigotransactionservice.services.point.PointService;
+import id.holigo.services.holigotransactionservice.services.train.TrainService;
 import id.holigo.services.holigotransactionservice.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,20 @@ public class TransactionListener {
     private DepositService depositService;
 
     private UserService userService;
+
+    private AirlinesService airlinesService;
+
+    private TrainService trainService;
+
+    @Autowired
+    public void setTrainService(TrainService trainService) {
+        this.trainService = trainService;
+    }
+
+    @Autowired
+    public void setAirlinesService(AirlinesService airlinesService) {
+        this.airlinesService = airlinesService;
+    }
 
     @Autowired
     public void setDepositService(DepositService depositService) {
@@ -252,17 +268,23 @@ public class TransactionListener {
             transaction.setVoucherCode(transactionDto.getVoucherCode());
             transaction.setDiscountAmount(transactionDto.getDiscountAmount());
             transactionRepository.save(transaction);
-            if (transaction.getTransactionType().equals("HTD")) {
-                if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
-                    depositService.issuedDeposit(DepositTransactionDto.builder()
-                            .id(Long.valueOf(transaction.getTransactionId()))
-                            .paymentStatus(transaction.getPaymentStatus())
-                            .orderStatus(transaction.getOrderStatus())
-                            .paymentServiceId(transaction.getPaymentServiceId())
-                            .fareAmount(transaction.getFareAmount())
-                            .paymentId(transaction.getPaymentId())
-                            .build());
+            switch (transaction.getTransactionType()) {
+                case "HTD" -> {
+                    if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
+                        depositService.issuedDeposit(DepositTransactionDto.builder()
+                                .id(Long.valueOf(transaction.getTransactionId()))
+                                .paymentStatus(transaction.getPaymentStatus())
+                                .orderStatus(transaction.getOrderStatus())
+                                .paymentServiceId(transaction.getPaymentServiceId())
+                                .fareAmount(transaction.getFareAmount())
+                                .paymentId(transaction.getPaymentId())
+                                .build());
+                    }
                 }
+                case "AIR" ->
+                        airlinesService.updatePayment(Long.valueOf(transaction.getTransactionId()), transaction.getPaymentStatus());
+                case "TRAIN" ->
+                        trainService.updatePayment(Long.valueOf(transaction.getTransactionId()), transaction.getPaymentStatus());
             }
 
         }

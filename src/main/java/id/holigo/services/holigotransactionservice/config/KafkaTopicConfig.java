@@ -31,12 +31,20 @@ public class KafkaTopicConfig {
 
     public static final String UPDATE_HOTEL_TRANSACTION = "update-hotel-transaction";
 
-    public static final String UPDATE_AIRLINES_TRANSACTION = "update-airlines-transaction";
+    public static final String UPDATE_ORDER_STATUS_AIRLINES_TRANSACTION = "update-order-status-airlines-transaction";
+
+    public static final String UPDATE_PAYMENT_STATUS_AIRLINES_TRANSACTION = "update-payment-status-airlines-transaction";
     public static final String UPDATE_PAYMENT = "update-payment";
 
     public static final String CANCEL_PAYMENT = "cancel-payment";
 
     public static final String UPDATE_DEPOSIT_TRANSACTION = "update-deposit-transaction";
+
+    public static final String UPDATE_ORDER_STATUS_TRAIN_TRANSACTION = "update-order-status-train-transaction";
+
+    public static final String UPDATE_PAYMENT_STATUS_TRAIN_TRANSACTION = "update-payment-status-train-transaction";
+
+    public static final String UPDATE_DATA_SUBSIDY_AP_SUPPLIER_TRANSACTION = "update-data-subsidy-ap-supplier-transaction";
 
     @Bean
     public NewTopic updatePulsaTransaction() {
@@ -110,6 +118,26 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic updateDepositTransaction() {
         return TopicBuilder.name(UPDATE_DEPOSIT_TRANSACTION).build();
+    }
+
+    @Bean
+    public NewTopic updateOrderStatusAirlinesTransaction() {
+        return TopicBuilder.name(UPDATE_ORDER_STATUS_AIRLINES_TRANSACTION).build();
+    }
+
+    @Bean
+    public NewTopic updatePaymentStatusAirlinesTransaction() {
+        return TopicBuilder.name(UPDATE_PAYMENT_STATUS_AIRLINES_TRANSACTION).build();
+    }
+
+    @Bean
+    public NewTopic updateOrderStatusTrainTransaction() {
+        return TopicBuilder.name(UPDATE_ORDER_STATUS_TRAIN_TRANSACTION).build();
+    }
+
+    @Bean
+    public NewTopic updatePaymentStatusTrainTransaction() {
+        return TopicBuilder.name(UPDATE_PAYMENT_STATUS_TRAIN_TRANSACTION).build();
     }
 
 

@@ -76,10 +76,8 @@ public class TransactionServiceImpl implements TransactionService {
         GenericAndSpecification<Transaction> genericAndSpecification = new GenericAndSpecification<>();
         genericAndSpecification.add(new SearchCriteria("userId", userId, SearchOperation.EQUAL));
 
-        if (transactionType != null) {
+        if (transactionType != null && !transactionType.equals("")) {
             switch (transactionType) {
-                case "AIR", "HTL" ->
-                        genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
                 case "PRE" -> {
                     PrepaidEnum[] prepaidEnums = PrepaidEnum.values();
                     for (PrepaidEnum prepaidEnum : prepaidEnums
@@ -94,6 +92,8 @@ public class TransactionServiceImpl implements TransactionService {
                         serviceCodes.add(postpaidEnum.name());
                     }
                 }
+                default -> genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+
             }
         }
 
@@ -204,7 +204,6 @@ public class TransactionServiceImpl implements TransactionService {
                     paymentStatusTransactionService.paymentHasCanceled(transaction.getId());
                 }
             }
-
         }
     }
 
@@ -225,6 +224,20 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionDto.getServiceId().toString() + "/"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "/" + transactionDto.getTransactionId();
+    }
+
+    @Override
+    public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto){
+        log.info("Listened Update Data -> {}", transactionDto);
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
+        if(fetchTransaction.isPresent()){
+            Transaction transaction = fetchTransaction.get();
+            transaction.setSupplierTransactionId(transactionDto.getSupplierTransactionId());
+            transaction.setIndexProduct(transactionDto.getIndexProduct());
+            transaction.setApAmount(transactionDto.getApAmount());
+            transaction.setSubsidyAmount(transactionDto.getSubsidyAmount());
+            transactionRepository.save(transaction);
+        }
     }
 
 }

@@ -146,9 +146,8 @@ public class ExpiryTransaction {
                             .orderStatus(OrderStatusEnum.ORDER_EXPIRED).build());
                     break;
                 case "AIR":
-                    airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
+                    airlinesKafkaTemplate.send(KafkaTopicConfig.UPDATE_ORDER_STATUS_AIRLINES_TRANSACTION, AirlinesTransactionDtoForUser.builder()
                             .id(Long.valueOf(transaction.getTransactionId()))
-                            .paymentStatus(PaymentStatusEnum.PAYMENT_EXPIRED)
                             .orderStatus(OrderStatusEnum.ORDER_EXPIRED)
                             .build());
                     break;

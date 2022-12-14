@@ -3,6 +3,7 @@ package id.holigo.services.holigotransactionservice.config;
 import id.holigo.services.common.model.AirlinesTransactionDtoForUser;
 import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.PaymentDto;
+import id.holigo.services.common.model.TrainTransactionDtoForUser;
 import id.holigo.services.common.model.creditcard.PostpaidCreditcardTransactionDto;
 import id.holigo.services.common.model.electricities.PostpaidElectricitiesTransactionDto;
 import id.holigo.services.common.model.electricities.PrepaidElectricitiesTransactionDto;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    @Value(("${spring.kafka.bootstrap-servers}"))
+    @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     public Map<String, Object> producerConfig() {
@@ -178,8 +179,18 @@ public class KafkaProducerConfig {
     }
 
     @Bean
+    public ProducerFactory<String, TrainTransactionDtoForUser> trainTransactionProducer() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+    @Bean
     public KafkaTemplate<String, AirlinesTransactionDtoForUser> airlinesKafkaTemplate(ProducerFactory<String, AirlinesTransactionDtoForUser> airlinesTransactionProducer) {
         return new KafkaTemplate<>(airlinesTransactionProducer);
+    }
+
+    @Bean
+    public KafkaTemplate<String, TrainTransactionDtoForUser> trainKafkaTemplate(ProducerFactory<String, TrainTransactionDtoForUser> trainTransactionProducer) {
+        return new KafkaTemplate<>(trainTransactionProducer);
     }
 
     @Bean
