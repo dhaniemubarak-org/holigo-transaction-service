@@ -17,14 +17,6 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService {
 
     private UserServiceFeignClient userServiceFeignClient;
-
-    private QueueUpdateUserReferralPointRepository queueUpdateUserReferralPointRepository;
-
-    @Autowired
-    public void setQueueUpdateUserReferralPointRepository(QueueUpdateUserReferralPointRepository queueUpdateUserReferralPointRepository) {
-        this.queueUpdateUserReferralPointRepository = queueUpdateUserReferralPointRepository;
-    }
-
     @Autowired
     public void setUserServiceFeignClient(UserServiceFeignClient userServiceFeignClient) {
         this.userServiceFeignClient = userServiceFeignClient;
@@ -40,20 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updatePointReferral(Long id, Integer point) {
-        try {
-            UserReferralDto userReferralDto = UserReferralDto.builder()
-                    .point(point)
-                    .build();
-            ResponseEntity<HttpStatus> response = userServiceFeignClient.putUserPointReferral(id, userReferralDto);
-
-            if (response.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
-                throw new Exception(Objects.requireNonNull(response.getBody()).toString());
-            }
-        } catch (Exception e) {
-            log.error("Error : {}", e.getMessage());
-            queueUpdateUserReferralPointRepository.save(QueueUpdateUserReferralPoint.builder()
-                    .userId(id).hasSent(false).point(point).build());
-        }
+    public ResponseEntity<HttpStatus> updatePointReferral(Long id, Integer point) {
+        UserReferralDto userReferralDto = UserReferralDto.builder()
+                .point(point)
+                .build();
+        return userServiceFeignClient.putUserPointReferral(id, id, userReferralDto);
     }
 }

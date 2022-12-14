@@ -5,10 +5,7 @@ import id.holigo.services.common.model.UserReferralDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "holigo-user-service")
 public interface UserServiceFeignClient {
@@ -20,5 +17,5 @@ public interface UserServiceFeignClient {
     ResponseEntity<UserDto> getCompleteUser(@PathVariable("id") Long id);
 
     @RequestMapping(method = RequestMethod.PUT, value = USER_POINT_REFERRAL_PATH)
-    ResponseEntity<HttpStatus> putUserPointReferral(@PathVariable("id") Long id, @RequestBody UserReferralDto userReferralDto);
+    ResponseEntity<HttpStatus> putUserPointReferral(@PathVariable("id") Long id, @RequestHeader("user-id") Long userId, @RequestBody UserReferralDto userReferralDto);
 }
