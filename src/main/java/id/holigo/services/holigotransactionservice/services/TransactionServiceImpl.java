@@ -1,5 +1,7 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -228,7 +230,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto){
-        log.info("Listened Update Data -> {}", transactionDto);
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if(fetchTransaction.isPresent()){
             Transaction transaction = fetchTransaction.get();
@@ -236,6 +237,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setIndexProduct(transactionDto.getIndexProduct());
             transaction.setApAmount(transactionDto.getApAmount());
             transaction.setSubsidyAmount(transactionDto.getSubsidyAmount());
+            transaction.setNote(transactionDto.getNote());
             transactionRepository.save(transaction);
         }
     }
