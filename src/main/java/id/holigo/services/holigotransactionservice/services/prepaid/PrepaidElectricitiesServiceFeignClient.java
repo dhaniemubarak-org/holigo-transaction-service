@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "holigo-prepaid-electricities-service")
 public interface PrepaidElectricitiesServiceFeignClient {
 
-    static String DETAIL_TRANSACTION = "/api/v1/prepaid/PLNRE/transactions/{id}";
+    static String DETAIL_TRANSACTION = "/api/v1/prepaid/PLNPRE/transactions/{id}";
 
     @RequestMapping(method = RequestMethod.GET, value = DETAIL_TRANSACTION)
     ResponseEntity<Object> getDetailTransaction(@PathVariable Long id);
