@@ -232,6 +232,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto){
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
         if(fetchTransaction.isPresent()){
+            log.info("Updated Data -> {}", transactionDto);
             Transaction transaction = fetchTransaction.get();
             transaction.setSupplierTransactionId(transactionDto.getSupplierTransactionId());
             transaction.setIndexProduct(transactionDto.getIndexProduct());

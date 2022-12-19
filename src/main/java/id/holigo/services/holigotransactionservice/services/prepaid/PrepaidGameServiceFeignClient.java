@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "holigo-prepaid-game-service")
+@FeignClient(name = "holigo-prepaid-games-service")
 public interface PrepaidGameServiceFeignClient {
 
     static String DETAIL_TRANSACTION = "/api/v1/prepaid/GAME/transactions/{id}";
