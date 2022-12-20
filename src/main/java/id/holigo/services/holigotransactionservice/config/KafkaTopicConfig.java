@@ -44,6 +44,8 @@ public class KafkaTopicConfig {
 
     public static final String UPDATE_PAYMENT_STATUS_TRAIN_TRANSACTION = "update-payment-status-train-transaction";
 
+    public static final String UPDATE_DATA_SUBSIDY_AP_SUPPLIER_TRANSACTION = "update-data-subsidy-ap-supplier-transaction";
+
     @Bean
     public NewTopic updatePulsaTransaction() {
         return TopicBuilder.name(UPDATE_PULSA_TRANSACTION).build();

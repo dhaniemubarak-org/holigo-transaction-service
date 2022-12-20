@@ -49,21 +49,21 @@ public class ProductRoute {
     public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
         Object fetchData = null;
         switch (transactionType) {
-            case "PUL", "PD", "PR" -> fetchData = productPulsa.sendDetailProduct(id, locale).getDetail();
-            case "PRA", "PLNPRE" -> fetchData = productPln.sendDetailProduct(id).getDetail();
-            case "PAM" -> fetchData = productPdam.sendDetailProduct(id).getDetail();
-            case "GAME" -> fetchData = productGame.sendDetailProduct(id).getDetail();
-            case "PAS", "PLNPOST" -> fetchData = productPLNPAS.sendDetalProduct(id).getDetail();
-            case "EWAL", "DWAL" -> fetchData = productEwallet.sendDetailProduct(id).getDetail();
-            case "NETV" -> fetchData = productNetv.sendDetailProduct(id).getDetail();
-            case "INS" -> fetchData = productInsurance.sendDetailProduct(id).getDetail();
-            case "MFN" -> fetchData = productMultifinance.sendDetailProduct(id).getDetail();
-            case "TLP" -> fetchData = productTelephone.sendDetailProduct(id).getDetail();
-            case "CC" -> fetchData = productCreditcard.sendDetailProduct(id).getDetail();
-            case "HTL" -> fetchData = productHotel.sendDetailProduct(id).getDetail();
+            case "PUL", "PD", "PR" -> fetchData = productPulsa.getDetailTransaction(id, locale);
+            case "PRA", "PLNPRE" -> fetchData = productPln.getDetailTransaction(id);
+            case "PAM" -> fetchData = productPdam.getDetailTransaction(id);
+            case "GAME" -> fetchData = productGame.getDetailTransaction(id);
+            case "PAS", "PLNPOST" -> fetchData = productPLNPAS.getDetailTransaction(id);
+            case "EWAL", "DWAL" -> fetchData = productEwallet.getDetailTransaction(id);
+            case "NETV" -> fetchData = productNetv.getDetailTransaction(id);
+            case "INS" -> fetchData = productInsurance.getDetailTransaction(id);
+            case "MFN" -> fetchData = productMultifinance.getDetailTransaction(id);
+            case "TLP" -> fetchData = productTelephone.getDetailTransaction(id);
+            case "CC" -> fetchData = productCreditcard.getDetailTransaction(id);
+            case "HTL" -> fetchData = productHotel.getDetailTransaction(id);
             case "AIR" -> fetchData = airlinesService.getTransaction(id);
-            case "GAS" -> fetchData = postpaidGasTransactionService.sendDetailProduct(id).getDetail();
-            case "STREAMING" -> fetchData = prepaidStreamingTransactionService.sendDetailProduct(id).getDetail();
+            case "GAS" -> fetchData = postpaidGasTransactionService.getDetailTransaction(id);
+            case "STREAMING" -> fetchData = prepaidStreamingTransactionService.getDetailTransaction(id);
             case "TRAIN" -> fetchData = trainService.getTransaction(id);
         }
         return fetchData;

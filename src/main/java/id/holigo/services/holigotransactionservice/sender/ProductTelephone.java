@@ -7,6 +7,7 @@ import javax.jms.Session;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidTelephoneServiceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -27,6 +28,7 @@ public class ProductTelephone {
 
     @Autowired
     private final ObjectMapper objectMapper;
+    private final PostpaidTelephoneServiceFeignClient postpaidTelephoneServiceFeignClient;
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
         log.info("Trying Sending TLP -> {}", id);
@@ -55,5 +57,9 @@ public class ProductTelephone {
         }
 
         return productTransaction;
+    }
+
+    public Object getDetailTransaction(Long id){
+        return postpaidTelephoneServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }

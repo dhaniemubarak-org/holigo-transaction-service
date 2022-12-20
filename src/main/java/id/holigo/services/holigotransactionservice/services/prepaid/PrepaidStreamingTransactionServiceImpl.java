@@ -17,10 +17,11 @@ import javax.jms.Message;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PrepaidStreamingTransactionImpl implements PrepaidStreamingTransactionService{
+public class PrepaidStreamingTransactionServiceImpl implements PrepaidStreamingTransactionService{
 
     private final JmsTemplate jmsTemplate;
     private final ObjectMapper objectMapper;
+    private final PrepaidStreamingServiceFeignClient prepaidStreamingServiceFeignClient;
 
     public void issuedTransaction(PrepaidStreamingTransactionDto prepaidStreamingTransactionDto){
         jmsTemplate.convertAndSend(JmsConfig.ISSUED_PREPAID_STREAMING_BY_ID,
@@ -47,5 +48,10 @@ public class PrepaidStreamingTransactionImpl implements PrepaidStreamingTransact
             e.printStackTrace();
         }
         return retrieveDetailProductTransaction;
+    }
+
+    @Override
+    public Object getDetailTransaction(Long id){
+        return prepaidStreamingServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }

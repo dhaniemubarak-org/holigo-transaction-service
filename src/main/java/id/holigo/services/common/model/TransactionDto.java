@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -91,4 +93,13 @@ public class TransactionDto implements Serializable {
     private BigDecimal prcAmount;
 
     private BigDecimal lossAmount;
+
+    private Boolean isPointSent;
+
+    private Boolean isPrSent;
+
+    private BigDecimal apAmount;
+    private BigDecimal subsidyAmount;
+
+    private String supplierTransactionId;
 }

@@ -1,5 +1,7 @@
 package id.holigo.services.holigotransactionservice.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import id.holigo.services.common.model.OrderStatusEnum;
 import id.holigo.services.common.model.PaymentDtoForUser;
 import id.holigo.services.common.model.PaymentStatusEnum;
@@ -204,7 +206,6 @@ public class TransactionServiceImpl implements TransactionService {
                     paymentStatusTransactionService.paymentHasCanceled(transaction.getId());
                 }
             }
-
         }
     }
 
@@ -225,6 +226,21 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionDto.getServiceId().toString() + "/"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 + "/" + transactionDto.getTransactionId();
+    }
+
+    @Override
+    public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto){
+        Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
+        if(fetchTransaction.isPresent()){
+            log.info("Updated Data -> {}", transactionDto);
+            Transaction transaction = fetchTransaction.get();
+            transaction.setSupplierTransactionId(transactionDto.getSupplierTransactionId());
+            transaction.setIndexProduct(transactionDto.getIndexProduct());
+            transaction.setApAmount(transactionDto.getApAmount());
+            transaction.setSubsidyAmount(transactionDto.getSubsidyAmount());
+            transaction.setNote(transactionDto.getNote());
+            transactionRepository.save(transaction);
+        }
     }
 
 }

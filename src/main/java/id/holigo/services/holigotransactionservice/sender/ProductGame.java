@@ -7,6 +7,7 @@ import javax.jms.Session;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidGameServiceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -25,6 +26,7 @@ public class ProductGame {
 
     @Autowired
     private final ObjectMapper objectMapper;
+    private final PrepaidGameServiceFeignClient prepaidGameServiceFeignClient;
 
     public DetailProductTransaction sendDetailProduct(Long id) throws JMSException {
         DetailProductTransaction productTransaction = DetailProductTransaction.builder().id(id).build();
@@ -52,5 +54,9 @@ public class ProductGame {
         }
 
         return detailProduct;
+    }
+
+    public Object getDetailTransaction(Long id){
+        return prepaidGameServiceFeignClient.getDetailTransaction(id).getBody();
     }
 }

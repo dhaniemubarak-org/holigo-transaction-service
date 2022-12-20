@@ -25,4 +25,6 @@ public interface TransactionService {
 
     void checkPaymentStatus(Transaction transaction);
 
+    void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto);
+
 }
