@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "holigo-postpaid-creditcard-service")
+@FeignClient(name = "holigo-postpaid-banktransfer-service")
 public interface PostpaidBankTransferServiceFeignClient {
 
     static String DETAIL_TRANSACTION = "/api/v1/postpaid/TF/transactions/{id}";
