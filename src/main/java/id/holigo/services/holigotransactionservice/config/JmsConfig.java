@@ -45,6 +45,7 @@ public class JmsConfig {
     public static final String GET_DETAIL_TRANSACTION_GAS = "get-detail-transaction-gas";
     public static final String DETAIL_TRANSACTION_PRODUCT_STREAMING = "detail-transaction-product-streaming";
     public static final String ISSUED_PREPAID_STREAMING_BY_ID = "issued-prepaid-streaming-by-id";
+    public static final String ISSUED_POSTPAID_BANKTRANSFER_BY_ID = "issued-postpaid-banktransfer-by-id";
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {

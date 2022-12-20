@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import id.holigo.services.common.model.DepositTransactionDto;
 import id.holigo.services.common.model.PaymentStatusEnum;
+import id.holigo.services.common.model.banktransfer.PostpaidBankTransferTransactionDto;
 import id.holigo.services.common.model.gas.PostpaidGasTransactionDto;
 import id.holigo.services.common.model.hotel.HotelTransactionDto;
 import id.holigo.services.common.model.streaming.PrepaidStreamingTransactionDto;
@@ -82,6 +83,7 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
     private final DepositService depositService;
 
     private final HotelService hotelService;
+    private final PostpaidBankTransferTransactionService postpaidBankTransferTransactionService;
 
     @Override
     public void configure(StateMachineStateConfigurer<OrderStatusEnum, OrderStatusEvent> states) throws Exception {
@@ -265,6 +267,11 @@ public class OrderTransactionSMConfig extends StateMachineConfigurerAdapter<Orde
                                 .id(Long.valueOf(transaction.getTransactionId()))
                                 .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
                                 .transactionId(transaction.getId()).build());
+                case "TF" ->
+                    postpaidBankTransferTransactionService.issuedTransaction(PostpaidBankTransferTransactionDto.builder()
+                            .id(Long.valueOf(transaction.getTransactionId()))
+                            .paymentStatus(transaction.getPaymentStatus()).orderStatus(transaction.getOrderStatus())
+                            .transactionId(transaction.getId()).build());
             }
         };
     }

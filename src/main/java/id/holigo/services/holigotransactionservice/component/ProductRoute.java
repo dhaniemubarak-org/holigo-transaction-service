@@ -4,6 +4,7 @@ import javax.jms.JMSException;
 
 import id.holigo.services.holigotransactionservice.sender.*;
 import id.holigo.services.holigotransactionservice.services.airlines.AirlinesService;
+import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidBankTransferTransactionService;
 import id.holigo.services.holigotransactionservice.services.postpaid.PostpaidGasTransactionService;
 import id.holigo.services.holigotransactionservice.services.prepaid.PrepaidStreamingTransactionService;
 import id.holigo.services.holigotransactionservice.services.train.TrainService;
@@ -44,6 +45,7 @@ public class ProductRoute {
     private final ProductHotel productHotel;
     private final PostpaidGasTransactionService postpaidGasTransactionService;
     private final PrepaidStreamingTransactionService prepaidStreamingTransactionService;
+    private final PostpaidBankTransferTransactionService postpaidBankTransferTransactionService;
 
     @Transactional
     public Object getDetailProduct(String transactionType, Long id, String locale) throws JMSException {
@@ -65,6 +67,7 @@ public class ProductRoute {
             case "GAS" -> fetchData = postpaidGasTransactionService.getDetailTransaction(id);
             case "STREAMING" -> fetchData = prepaidStreamingTransactionService.getDetailTransaction(id);
             case "TRAIN" -> fetchData = trainService.getTransaction(id);
+            case "TF" -> fetchData = postpaidBankTransferTransactionService.getDetailTransaction(id);
         }
         return fetchData;
     }
