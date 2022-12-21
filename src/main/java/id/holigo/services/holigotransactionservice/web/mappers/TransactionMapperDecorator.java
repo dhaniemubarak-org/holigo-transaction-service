@@ -1,6 +1,7 @@
 package id.holigo.services.holigotransactionservice.web.mappers;
 
 import id.holigo.services.common.model.UserDto;
+import id.holigo.services.holigotransactionservice.services.TransactionStatusConverter;
 import id.holigo.services.holigotransactionservice.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -47,6 +48,11 @@ public abstract class TransactionMapperDecorator implements TransactionMapper {
                     + paymentDtoForUser.getDetailType() + "/" + paymentDtoForUser.getDetailId());
             transactionDtoForUser.setPayment(paymentDtoForUser);
         }
+        if (transaction.getOrderStatus() != null && transaction.getPaymentStatus()!=null){
+
+            transactionDtoForUser.setStatus(TransactionStatusConverter.combinedStatus(transaction.getPaymentStatus(), transaction.getOrderStatus()));
+        }
+
         return transactionDtoForUser;
     }
 

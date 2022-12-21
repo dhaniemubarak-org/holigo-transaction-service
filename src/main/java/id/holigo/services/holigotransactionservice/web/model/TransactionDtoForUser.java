@@ -54,6 +54,8 @@ public class TransactionDtoForUser {
 
     private OrderStatusEnum orderStatus;
 
+    private TransactionFilterEnum status;
+
     private Integer serviceId;
 
     private Integer productId;
