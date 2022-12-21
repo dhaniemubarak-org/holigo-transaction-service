@@ -60,6 +60,8 @@ public class TransactionDtoForUser {
 
     private Integer productId;
 
+    private String supplierTransactionId;
+
     private Object detail;
 
     @Builder.Default
