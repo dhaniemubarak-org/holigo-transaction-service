@@ -18,6 +18,8 @@ import java.util.List;
 public class AirlinesTransactionTripDtoForUser implements Serializable {
     private String flightNumber;
 
+    private String seatClass;
+
     private List<AirlinesTransactionTripItineraryDto> itineraries;
 
     private Integer segment;
