@@ -40,4 +40,6 @@ public class AirlinesTransactionTripItineraryDto implements Serializable {
     private String imageUrl;
 
     private Integer transit;
+
+    private String subclass;
 }
