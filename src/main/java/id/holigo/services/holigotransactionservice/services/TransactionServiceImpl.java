@@ -94,7 +94,8 @@ public class TransactionServiceImpl implements TransactionService {
                         serviceCodes.add(postpaidEnum.name());
                     }
                 }
-                default -> genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
+                default ->
+                        genericAndSpecification.add(new SearchCriteria("transactionType", transactionType, SearchOperation.EQUAL));
 
             }
         }
@@ -200,6 +201,10 @@ public class TransactionServiceImpl implements TransactionService {
         if (fetchTransaction.isPresent()) {
             Transaction transaction = fetchTransaction.get();
             if (transaction.getUserId().equals(userId)) {
+                if (!transaction.getOrderStatus().equals(OrderStatusEnum.ISSUED)) {
+                    paymentStatusTransactionService.paymentHasCanceled(transaction.getId());
+                    orderStatusTransactionService.cancelTransaction(transaction.getId());
+                }
                 transaction.setDeletedAt(Timestamp.valueOf(LocalDateTime.now()));
                 transactionRepository.save(transaction);
                 if (transaction.getPaymentStatus().equals(PaymentStatusEnum.WAITING_PAYMENT)) {
@@ -229,9 +234,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto){
+    public void updateDataSubsidyApSupplierTransaction(TransactionDto transactionDto) {
         Optional<Transaction> fetchTransaction = transactionRepository.findById(transactionDto.getId());
-        if(fetchTransaction.isPresent()){
+        if (fetchTransaction.isPresent()) {
             log.info("Updated Data -> {}", transactionDto);
             Transaction transaction = fetchTransaction.get();
             transaction.setSupplierTransactionId(transactionDto.getSupplierTransactionId());
